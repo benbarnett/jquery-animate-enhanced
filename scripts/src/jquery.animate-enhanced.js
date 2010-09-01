@@ -38,12 +38,9 @@ Usage (exactly the same as it would be normally):
 	// ----------
 	// Check if this browser supports CSS3 transitions
 	// ----------
-	(function() {
-	    var thisBody = document.body || document.documentElement,
-    	thisStyle = thisBody.style,
-    	cssTransitionsSupported = thisStyle.WebkitTransition !== undefined || thisStyle.MozTransition !== undefined || thisStyle.OTransition !== undefined || thisStyle.transition !== undefined;
-	})();
-	
+	var thisBody = document.body || document.documentElement,
+   	thisStyle = thisBody.style,
+   	cssTransitionsSupported = thisStyle.WebkitTransition !== undefined || thisStyle.MozTransition !== undefined || thisStyle.OTransition !== undefined || thisStyle.transition !== undefined;
 	
 	// ----------
 	// Make a translate or translate3d string
