@@ -39,10 +39,9 @@ Usage (exactly the same as it would be normally):
 	// Check if this browser supports CSS3 transitions
 	// ----------
 	(function() {
-	    var div = document.createElement('div');
-	    div.setAttribute('style', 'transition:top 1s ease;-webkit-transition:top 1s ease;-moz-transition:top 1s ease;-o-transition:top 1s ease;');
-	    cssTransitionsSupported = !!(div.style.transition || div.style.webkitTransition || div.style.MozTransition || div.style.OTransition);
-	    delete div;
+	    var thisBody = document.body || document.documentElement,
+    	thisStyle = thisBody.style,
+    	cssTransitionsSupported = thisStyle.WebkitTransition !== undefined || thisStyle.MozTransition !== undefined || thisStyle.OTransition !== undefined || thisStyle.transition !== undefined;
 	})();
 	
 	
