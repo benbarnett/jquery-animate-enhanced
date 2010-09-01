@@ -40,7 +40,8 @@ Usage (exactly the same as it would be normally):
 	// ----------
 	var thisBody = document.body || document.documentElement,
    	thisStyle = thisBody.style,
-   	cssTransitionsSupported = thisStyle.WebkitTransition !== undefined || thisStyle.MozTransition !== undefined || thisStyle.OTransition !== undefined || thisStyle.transition !== undefined;
+   	cssTransitionsSupported = thisStyle.WebkitTransition !== undefined || thisStyle.MozTransition !== undefined || thisStyle.OTransition !== undefined || thisStyle.transition !== undefined,
+	transitionEndEvent = (thisStyle.WebkitTransition !== undefined) ? "webkitTransitionEnd" : (thisStyle.OTransition !== undefined) ? "oTransitionEnd" : "transitionend";
 	
 	// ----------
 	// Make a translate or translate3d string
@@ -188,9 +189,7 @@ Usage (exactly the same as it would be normally):
 			this.each(function() {
 				callbackQueue++;
 
-				// TODO: Make this less browser specific, this will have to do for now
-				$(this).bind(($.browser.webkit) ? 'webkitTransitionEnd' : 'transitionend', propertyCallback);
-				$(this).css(cssProperties);
+				$(this).bind(transitionEndEvent, propertyCallback).css(cssProperties);
 			});
 		}
 		
