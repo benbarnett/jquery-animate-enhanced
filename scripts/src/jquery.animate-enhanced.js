@@ -29,7 +29,7 @@ Usage (exactly the same as it would be normally):
 		originalAnimateMethod = $.fn.animate,
 		rupper = /([A-Z])/g,
 		cssTransitionProperties = ["top", "left", "opacity"],
-		cssPrefixes = ["", "-webkit-", "-moz", "-o"],
+		cssPrefixes = ["", "-webkit-", "-moz-", "-o-"],
 		callbackQueue = 0,
 		cssMeta = {};
 		
