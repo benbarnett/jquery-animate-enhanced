@@ -1,5 +1,5 @@
 /************************************************
-	jquery.animate-enhanced plugin v0.1
+	jquery.animate-enhanced plugin v0.2
 	Author: www.benbarnett.net || @benpbarnett
 *************************************************
 
