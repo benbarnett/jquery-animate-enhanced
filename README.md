@@ -36,6 +36,6 @@ By default if the plugin is animating a left or a top property, the translate (2
 Credits
 -----------------
 
-Author: Ben Barnett - http://www.benbarnett.net - @benpbarnett
-HeyDanno! for his tips on detecting CSS3 support
-Aza for his gist on CSS Animation wtih jQuery
+* Author: Ben Barnett - http://www.benbarnett.net - @benpbarnett
+* HeyDanno! for his tips on detecting CSS3 support
+* Aza for his gist on CSS Animation wtih jQuery

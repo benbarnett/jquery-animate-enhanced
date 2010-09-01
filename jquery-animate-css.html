@@ -47,6 +47,33 @@
 		p#results {
 			color:#c00;
 		}
+		
+		.ribbon {
+		 	background-color: #a00;
+	        overflow: hidden;
+	        /* top left corner */
+	        position: fixed;
+	        left: -3.7em;
+	        top: 3.7em;
+	        /* 45 deg ccw rotation */
+	        -moz-transform: rotate(-45deg);
+	        -webkit-transform: rotate(-45deg);
+	        /* shadow */
+	        -moz-box-shadow: 0 0 1em #888;
+	        -webkit-box-shadow: 0 0 1em #888;
+	      }
+	      .ribbon a {
+	        border: 1px solid #faa;
+	        color: #fff;
+	        display: block;
+	        font: bold 13px 'Helvetiva Neue', Helvetica, Arial, sans-serif;
+	        margin: 0.05em 0 0.075em 0;
+	        padding: 0.5em 3.5em;
+	        text-align: center;
+	        text-decoration: none;
+	        /* shadow */
+	        text-shadow: 0 0 0.5em #444;
+	      }
 	</style>
 </head>
 <body>
@@ -66,11 +93,11 @@
 	
 	<button>Animate left by 200px</button>
 	
-	<p id="results">Awaiting user action...</p>
+	<p id="results">Awaiting button click...</p>
 	
 	<pre>$('button').click(function() {
 	var results = $('p#results').html("Animating...");
-	$('#target').animate({left: 200, width:320}, 1000, function() {
+	$('#target').animate({left: '200px', width:'320px'}, 1000, function() {
 		results.html("callback() fired");
 	});
 });
@@ -112,13 +139,16 @@
 		<li>Aza for <a href="http://gist.github.com/435054">his gist</a> on CSS Animation wtih jQuery</li>
 	</ul>
 		
+	<div class="ribbon">
+		<a href="http://github.com/benbarnett/jQuery-Animate-Enhanced">Fork me on GitHub</a> 
+	</div>
 	
 	<script type="text/javascript" src="scripts/contrib/jquery-1.4.2.js"></script>
 	<script type="text/javascript" src="scripts/src/jquery.animate-enhanced.js"></script>
 	<script type="text/javascript" charset="utf-8">
 		$('button').click(function() {
 			var results = $('p#results').html("Animating...");
-			$('#target').animate({left: 200, width:320}, 1000, function() {
+			$('#target').animate({left: '200px', width:'320px'}, 1000, function() {
 				results.html("callback() fired");
 			});
 		});

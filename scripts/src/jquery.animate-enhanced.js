@@ -156,13 +156,14 @@ Usage (exactly the same as it would be normally):
 
 		// seperate out the properties for the relevant animation functions
 		for (p in prop) {
-			if ($.inArray(p, cssTransitionProperties) > -1) {
+			cleanVal = prop[p].replace(/px/g, "");
+			if ($.inArray(p, cssTransitionProperties) > -1 && $(this).css(p).replace(/px/g, "") !== cleanVal) {
 				$.fn.applyCSSTransition(
 					cssProperties, 
 					p, 
 					opt.duration, 
 					cssEasing, 
-					prop[p], 
+					cleanVal, 
 					(((p == "left" || p == "top") && prop.avoidTransforms !== true) ? true : false), 
 					(prop.useTranslate3d === true) ? true : false);
 					
@@ -187,13 +188,15 @@ Usage (exactly the same as it would be normally):
 		}
 		
 		// apply the CSS transitions
-		this.each(function() {
-			callbackQueue++;
-			
-			// TODO: Make this less browser specific, this will have to do for now
-			$(this).bind(($.browser.webkit) ? 'webkitTransitionEnd' : 'transitionend', propertyCallback);
-			$(this).css(cssProperties);
-		});
+		if (!$.isEmptyObject(cssProperties)) {
+			this.each(function() {
+				callbackQueue++;
+
+				// TODO: Make this less browser specific, this will have to do for now
+				$(this).bind(($.browser.webkit) ? 'webkitTransitionEnd' : 'transitionend', propertyCallback);
+				$(this).css(cssProperties);
+			});
+		}
 		
 		// over and out
 		return this;
