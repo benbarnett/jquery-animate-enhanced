@@ -10,6 +10,11 @@ Properties supported: (more to come)
 * top : using translate(x, y) or translate3d(x, y, z)
 * opacity
 
+Demo
+-----------------
+Simple animation demo and documentation found here: http://playground.benbarnett.net/jquery-animate-enhanced/
+
+
 What it does
 -----------------
 
