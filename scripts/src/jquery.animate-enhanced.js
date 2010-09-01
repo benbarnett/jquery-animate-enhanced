@@ -92,20 +92,13 @@ Usage (exactly the same as it would be normally):
 			if (callbackQueue <= 0) { 
 				// clean up the animation props
 				$(this).each(function() {
-					$(this).css({
-						'-moz-transition-property': 'none',  
-						'-moz-transition-duration': '',  
-						'-moz-transition-timing-function': '',
-						'-webkit-transition-property': 'none',  
-						'-webkit-transition-duration': '',  
-						'-webkit-transition-timing-function': '',
-						'-o-transition-property': 'none',  
-						'-o-transition-duration': '',  
-						'-o-transition-timing-function': '',
-						'transition-property': 'none',  
-						'transition-duration': '',  
-						'transition-timing-function': ''
-					});
+					var reset = {};
+					for (var i = cssPrefixes.length - 1; i >= 0; i--){
+						reset[cssPrefixes[i]+'transition-property'] = 'none';
+						reset[cssPrefixes[i]+'transition-duration'] = '';
+						reset[cssPrefixes[i]+'transition-timing-function'] = '';
+					};
+					$(this).css(reset);
 				});
 				
 				// convert translations to left & top for layout
@@ -153,14 +146,14 @@ Usage (exactly the same as it would be normally):
 
 		// seperate out the properties for the relevant animation functions
 		for (p in prop) {
-			cleanVal = prop[p].replace(/px/g, "");
+			var cleanVal = typeof prop[p] == "string" ? prop[p].replace(/px/g, "") : -1;
 			if ($.inArray(p, cssTransitionProperties) > -1 && $(this).css(p).replace(/px/g, "") !== cleanVal) {
 				$.fn.applyCSSTransition(
 					cssProperties, 
 					p, 
 					opt.duration, 
 					cssEasing, 
-					cleanVal, 
+					((p == "left" || p == "top") && prop.avoidTransforms === true) ? cleanVal + "px" : cleanVal, 
 					(((p == "left" || p == "top") && prop.avoidTransforms !== true) ? true : false), 
 					(prop.useTranslate3d === true) ? true : false);
 					
@@ -188,7 +181,6 @@ Usage (exactly the same as it would be normally):
 		if (!$.isEmptyObject(cssProperties)) {
 			this.each(function() {
 				callbackQueue++;
-
 				$(this).bind(transitionEndEvent, propertyCallback).css(cssProperties);
 			});
 		}
