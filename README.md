@@ -10,6 +10,8 @@ Properties supported: (more to come)
 * top : using translate(x, y) or translate3d(x, y, z)
 * opacity
 
+Note that any properties not mentioned above will simply be handled by the standard jQuery $.animate() method. This plugin adds new functionality without taking any away.
+
 Demo
 -----------------
 Simple animation demo and documentation found here: http://playground.benbarnett.net/jquery-animate-enhanced/
@@ -42,5 +44,5 @@ Credits
 -----------------
 
 * Author: Ben Barnett - http://www.benbarnett.net - @benpbarnett
-* HeyDanno! for his tips on detecting CSS3 support
-* Aza for his gist on CSS Animation wtih jQuery
+* HeyDanno! for his tips on detecting CSS3 support (http://gist.github.com/435054)
+* Aza for his gist on CSS Animation wtih jQuery (http://gist.github.com/373874)
