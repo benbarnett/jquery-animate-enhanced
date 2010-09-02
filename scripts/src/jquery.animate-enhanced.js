@@ -1,5 +1,5 @@
 /************************************************
-	jquery.animate-enhanced plugin v0.2
+	jquery.animate-enhanced plugin v0.25
 	Author: www.benbarnett.net || @benpbarnett
 *************************************************
 
@@ -27,7 +27,6 @@ Usage (exactly the same as it would be normally):
 	// ----------
 	var cssTransitionsSupported = false,
 		originalAnimateMethod = $.fn.animate,
-		rupper = /([A-Z])/g,
 		cssTransitionProperties = ["top", "left", "opacity"],
 		cssPrefixes = ["", "-webkit-", "-moz-", "-o-"],
 		callbackQueue = 0,
@@ -40,8 +39,8 @@ Usage (exactly the same as it would be normally):
 	// ----------
 	var thisBody = document.body || document.documentElement,
    	thisStyle = thisBody.style,
-   	cssTransitionsSupported = thisStyle.WebkitTransition !== undefined || thisStyle.MozTransition !== undefined || thisStyle.OTransition !== undefined || thisStyle.transition !== undefined,
 	transitionEndEvent = (thisStyle.WebkitTransition !== undefined) ? "webkitTransitionEnd" : (thisStyle.OTransition !== undefined) ? "oTransitionEnd" : "transitionend";
+	cssTransitionsSupported = thisStyle.WebkitTransition !== undefined || thisStyle.MozTransition !== undefined || thisStyle.OTransition !== undefined || thisStyle.transition !== undefined;
 	
 	// ----------
 	// Make a translate or translate3d string
@@ -69,7 +68,7 @@ Usage (exactly the same as it would be normally):
 			cssProperties[cssPrefixes[i]+'transition-property'] += ', ' + ((isTransform === true) ? cssPrefixes[i] + 'transform' : property);
 			cssProperties[cssPrefixes[i]+'transition-duration'] = duration + 'ms';
 			cssProperties[cssPrefixes[i]+'transition-timing-function'] = easing;
-			cssProperties[((isTransform === true) ? cssPrefixes[i]+'transform' : property)] = (isTransform === true) ? $.fn.getTranslation(cssMeta.left, cssMeta.top, use3D) : value;
+			cssProperties.secondary[((isTransform === true) ? cssPrefixes[i]+'transform' : property)] = (isTransform === true) ? $.fn.getTranslation(cssMeta.left, cssMeta.top, use3D) : value;
 		};
 		
 		return cssProperties;
@@ -138,7 +137,7 @@ Usage (exactly the same as it would be normally):
 			swing: 'ease-in-out'
 		},
 		cssProperties = {}, domProperties = null, cssEasing = "";
-		cssMeta.top = 0; cssMeta.left = 0;
+		cssProperties.secondary = {}; cssMeta.top = 0; cssMeta.left = 0;
 		
 		// make easing css friendly
 		cssEasing = opt.easing || "swing";
@@ -166,7 +165,6 @@ Usage (exactly the same as it would be normally):
 		}
 		
 		// clean up
-		delete cssProperties.internals;
 		for (var i = cssPrefixes.length - 1; i >= 0; i--){
 			if (typeof cssProperties[cssPrefixes[i]+'transition-property'] !== 'undefined') cssProperties[cssPrefixes[i]+'transition-property'] = cssProperties[cssPrefixes[i]+'transition-property'].substr(2);
 		}
@@ -180,8 +178,12 @@ Usage (exactly the same as it would be normally):
 		// apply the CSS transitions
 		if (!$.isEmptyObject(cssProperties)) {
 			this.each(function() {
+				var that = $(this);
 				callbackQueue++;
-				$(this).bind(transitionEndEvent, propertyCallback).css(cssProperties);
+				that.bind(transitionEndEvent, propertyCallback).css(cssProperties);
+				setTimeout(function(){ 
+					that.css(cssProperties.secondary);
+				});
 			});
 		}
 		
