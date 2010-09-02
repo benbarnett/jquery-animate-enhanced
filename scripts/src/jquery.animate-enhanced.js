@@ -1,5 +1,5 @@
 /************************************************
-	jquery.animate-enhanced plugin v0.25
+	jquery.animate-enhanced plugin v0.3
 	Author: www.benbarnett.net || @benpbarnett
 *************************************************
 
@@ -81,6 +81,9 @@ Usage (exactly the same as it would be normally):
 	$.fn.animate = function(prop, speed, easing, callback) {
 		if (!cssTransitionsSupported || $.isEmptyObject(prop)) return originalAnimateMethod.apply(this, arguments);
 		
+		callbackQueue = 0;
+		cssMeta = {};
+		
 		var opt = speed && typeof speed === "object" ? speed : {
 			complete: callback || !callback && easing ||
 				jQuery.isFunction( speed ) && speed,
@@ -90,38 +93,31 @@ Usage (exactly the same as it would be normally):
 			callbackQueue--;
 			if (callbackQueue <= 0) { 
 				// clean up the animation props
-				$(this).each(function() {
-					var reset = {};
-					for (var i = cssPrefixes.length - 1; i >= 0; i--){
-						reset[cssPrefixes[i]+'transition-property'] = 'none';
-						reset[cssPrefixes[i]+'transition-duration'] = '';
-						reset[cssPrefixes[i]+'transition-timing-function'] = '';
-					};
-					$(this).css(reset);
-				});
+				var reset = {};
+				for (var i = cssPrefixes.length - 1; i >= 0; i--){
+					reset[cssPrefixes[i]+'transition-property'] = 'none';
+					reset[cssPrefixes[i]+'transition-duration'] = '';
+					reset[cssPrefixes[i]+'transition-timing-function'] = '';
+				};
 				
 				// convert translations to left & top for layout
 				if (!prop.leaveTransforms === true) {
 					if (cssMeta.top !== 0) {
-						$(this).each(function(){
-							$(this).css({
-								'-webkit-transform': 'translate(0, 0)',
-								'-moz-transform': 'translate(0, 0)',
-								'-o-transform': 'translate(0, 0)',
-								'transform': 'translate(0, 0)',
-								'top': cssMeta.top + 'px'
-							});
+						$(this).css(reset).css({
+							'-webkit-transform': 'translate(0, 0)',
+							'-moz-transform': 'translate(0, 0)',
+							'-o-transform': 'translate(0, 0)',
+							'transform': 'translate(0, 0)',
+							'top': cssMeta.top + 'px'
 						});
 					}
 					if (cssMeta.left !== 0) {
-						$(this).each(function(){
-							$(this).css({
-								'-webkit-transform': 'translate(0, 0)',
-								'-moz-transform': 'translate(0, 0)',
-								'-o-transform': 'translate(0, 0)',
-								'transform': 'translate(0, 0)',
-								'left': cssMeta.left + 'px'
-							});
+						$(this).css(reset).css({
+							'-webkit-transform': 'translate(0, 0)',
+							'-moz-transform': 'translate(0, 0)',
+							'-o-transform': 'translate(0, 0)',
+							'transform': 'translate(0, 0)',
+							'left': cssMeta.left + 'px'
 						});
 					}
 				}
@@ -145,7 +141,7 @@ Usage (exactly the same as it would be normally):
 
 		// seperate out the properties for the relevant animation functions
 		for (p in prop) {
-			var cleanVal = typeof prop[p] == "string" ? prop[p].replace(/px/g, "") : -1;
+			var cleanVal = typeof prop[p] == "string" ? prop[p].replace(/px/g, "") : prop[p];
 			if ($.inArray(p, cssTransitionProperties) > -1 && $(this).css(p).replace(/px/g, "") !== cleanVal) {
 				$.fn.applyCSSTransition(
 					cssProperties, 
@@ -176,13 +172,13 @@ Usage (exactly the same as it would be normally):
 		}
 		
 		// apply the CSS transitions
-		if (!$.isEmptyObject(cssProperties)) {
+		if (!$.isEmptyObject(cssProperties.secondary)) {
 			this.each(function() {
-				var that = $(this);
+				var that = $(this).unbind(transitionEndEvent);
 				callbackQueue++;
-				that.bind(transitionEndEvent, propertyCallback).css(cssProperties);
+				that.css(cssProperties);
 				setTimeout(function(){ 
-					that.css(cssProperties.secondary);
+					that.bind(transitionEndEvent, propertyCallback).css(cssProperties.secondary);
 				});
 			});
 		}
