@@ -124,7 +124,7 @@ Usage (exactly the same as it would be normally):
 				
 				
 				// we're done, trigger the user callback
-				return opt.complete.call();
+				return opt.complete ? opt.complete.call() : null;
 			}
 		},
 		easings = {
