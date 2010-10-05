@@ -1,5 +1,5 @@
 /************************************************
-	jquery.animate-enhanced plugin v0.3
+	jquery.animate-enhanced plugin v0.4
 	Author: www.benbarnett.net || @benpbarnett
 *************************************************
 
@@ -19,6 +19,18 @@ Usage (exactly the same as it would be normally):
 		// callback
 	});
 	
+Changelog:
+	0.4 (05/10/2010):
+		- Iterate over multiple elements and store transforms in $.data perelement
+		- Include support for relative values (+= / -=)
+		- Better unit sanitization
+		- Performance tweaks
+		- Fix for optional callback function (was required)
+		- Applies data[translateX] and data[translateY] to elements for easy access
+		- Added 'easeInOutQuint' easing function for CSS transitions (requires jQuery UI for JS anims)
+		- Less need for leaveTransforms = true due to better position detections
+
+	
 *********/
 
 (function($) {
@@ -29,8 +41,9 @@ Usage (exactly the same as it would be normally):
 		originalAnimateMethod = $.fn.animate,
 		cssTransitionProperties = ["top", "left", "opacity"],
 		cssPrefixes = ["", "-webkit-", "-moz-", "-o-"],
+		pluginOptions = ["avoidTransforms", "useTranslate3d", "leaveTransforms"],
 		callbackQueue = 0,
-		cssMeta = {};
+		rfxnum = /^([+-]=)?([\d+-.]+)(.*)$/;
 		
 		
 	
@@ -38,9 +51,40 @@ Usage (exactly the same as it would be normally):
 	// Check if this browser supports CSS3 transitions
 	// ----------
 	var thisBody = document.body || document.documentElement,
-   	thisStyle = thisBody.style,
-	transitionEndEvent = (thisStyle.WebkitTransition !== undefined) ? "webkitTransitionEnd" : (thisStyle.OTransition !== undefined) ? "oTransitionEnd" : "transitionend";
+   		thisStyle = thisBody.style,
+		transitionEndEvent = (thisStyle.WebkitTransition !== undefined) ? "webkitTransitionEnd" : (thisStyle.OTransition !== undefined) ? "oTransitionEnd" : "transitionend";
+	
 	cssTransitionsSupported = thisStyle.WebkitTransition !== undefined || thisStyle.MozTransition !== undefined || thisStyle.OTransition !== undefined || thisStyle.transition !== undefined;
+	
+	
+	// ----------
+	// Interpret value ("px", "+=" and "-=" sanitisation)
+	// ----------
+	$.fn.interpretValue = function(e, val, prop) {
+		var parts = rfxnum.exec(val),
+			start = e.css(prop) === "auto" ? 0 : e.css(prop),
+			cleanCSSStart = typeof start == "string" ? start.replace(/px/g, "") : start,
+			cleanTarget = typeof val == "string" ? val.replace(/px/g, "") : val,
+			cleanStart = 0;
+			
+		if (prop == "left" && e.data('translateX')) cleanStart = cleanCSSStart + e.data('translateX');
+		if (prop == "top" && e.data('translateY')) cleanStart = cleanCSSStart + e.data('translateY');
+		
+		if (parts) {
+			var end = parseFloat(parts[2]);
+
+			// If a +=/-= token was provided, we're doing a relative animation
+			if (parts[1]) {
+				end = ((parts[1] === "-=" ? -1 : 1) * end) + parseInt(cleanStart, 10);
+			}
+
+			return end;
+
+		} else {
+			return clean;
+		}
+	};
+	
 	
 	// ----------
 	// Make a translate or translate3d string
@@ -50,25 +94,39 @@ Usage (exactly the same as it would be normally):
 	};
 	
 	
-	
 	// ----------
 	// Build up the CSS object
 	// ----------
-	$.fn.applyCSSTransition = function(cssProperties, property, duration, easing, value, isTransform, use3D) {		
-		if (property == "left" || property == "top") cssMeta[property] = value;
-		return $.fn.applyCSSWithPrefix(cssProperties, property, duration, easing, value, isTransform, use3D);
+	$.fn.applyCSSTransition = function(e, property, duration, easing, value, isTransform, use3D) {
+		if (!e.data('cssEnhanced')) {
+			var setup = { secondary: {}, meta: { left: 0, top: 0 } };
+			e.data('cssEnhanced', setup);
+		}
+		
+		if (property == "left" || property == "top") {
+			var meta = e.data('cssEnhanced').meta;
+			meta[property] = value;
+			meta[property+'_o'] = e.css(property) == "auto" ? 0 + value : parseInt(e.css(property).replace(/px/g, ''), 10) + value || 0;
+			e.data('cssEnhanced').meta = meta;
+		}
+		
+		return e.data('cssEnhanced', $.fn.applyCSSWithPrefix(e.data('cssEnhanced'), property, duration, easing, value, isTransform, use3D));
 	};
+	
 	
 	// ----------
 	// Helper function to build up CSS properties using the various prefixes
 	// ----------
 	$.fn.applyCSSWithPrefix = function(cssProperties, property, duration, easing, value, isTransform, use3D) {
+		cssProperties = typeof cssProperties === 'undefined' ? {} : cssProperties;
+		cssProperties.secondary = typeof cssProperties.secondary === 'undefined' ? {} : cssProperties.secondary;
+		
 		for (var i = cssPrefixes.length - 1; i >= 0; i--){			
 			if (typeof cssProperties[cssPrefixes[i] + 'transition-property'] === 'undefined') cssProperties[cssPrefixes[i] + 'transition-property'] = '';
 			cssProperties[cssPrefixes[i]+'transition-property'] += ', ' + ((isTransform === true) ? cssPrefixes[i] + 'transform' : property);
 			cssProperties[cssPrefixes[i]+'transition-duration'] = duration + 'ms';
 			cssProperties[cssPrefixes[i]+'transition-timing-function'] = easing;
-			cssProperties.secondary[((isTransform === true) ? cssPrefixes[i]+'transform' : property)] = (isTransform === true) ? $.fn.getTranslation(cssMeta.left, cssMeta.top, use3D) : value;
+			cssProperties.secondary[((isTransform === true) ? cssPrefixes[i]+'transform' : property)] = (isTransform === true) ? $.fn.getTranslation(cssProperties.meta.left, cssProperties.meta.top, use3D) : value;
 		};
 		
 		return cssProperties;
@@ -82,58 +140,57 @@ Usage (exactly the same as it would be normally):
 		if (!cssTransitionsSupported || $.isEmptyObject(prop)) return originalAnimateMethod.apply(this, arguments);
 		
 		callbackQueue = 0;
-		cssMeta = {};
 		
 		var opt = speed && typeof speed === "object" ? speed : {
 			complete: callback || !callback && easing ||
-				jQuery.isFunction( speed ) && speed,
+				$.isFunction( speed ) && speed,
 			duration: speed,
-			easing: callback && easing || easing && !jQuery.isFunction(easing) && easing
-		}, propertyCallback = function() {
-			callbackQueue--;
-			if (callbackQueue <= 0) { 
-				// clean up the animation props
-				var reset = {};
-				for (var i = cssPrefixes.length - 1; i >= 0; i--){
-					reset[cssPrefixes[i]+'transition-property'] = 'none';
-					reset[cssPrefixes[i]+'transition-duration'] = '';
-					reset[cssPrefixes[i]+'transition-timing-function'] = '';
-				};
-				
-				// convert translations to left & top for layout
-				if (!prop.leaveTransforms === true) {
-					if (cssMeta.top !== 0) {
-						$(this).css(reset).css({
-							'-webkit-transform': 'translate(0, 0)',
-							'-moz-transform': 'translate(0, 0)',
-							'-o-transform': 'translate(0, 0)',
-							'transform': 'translate(0, 0)',
-							'top': cssMeta.top + 'px'
-						});
-					}
-					if (cssMeta.left !== 0) {
-						$(this).css(reset).css({
-							'-webkit-transform': 'translate(0, 0)',
-							'-moz-transform': 'translate(0, 0)',
-							'-o-transform': 'translate(0, 0)',
-							'transform': 'translate(0, 0)',
-							'left': cssMeta.left + 'px'
-						});
-					}
+			easing: callback && easing || easing && !$.isFunction(easing) && easing
+		}, 	
+			propertyCallback = function() {	
+				callbackQueue--;
+				if (callbackQueue <= 0) { 			
+					// we're done, trigger the user callback
+					if (typeof opt.complete === 'function') return opt.complete.call();
+				}
+			},
+			cssCallback = function() {
+			var reset = {};
+			for (var i = cssPrefixes.length - 1; i >= 0; i--){
+				reset[cssPrefixes[i]+'transition-property'] = 'none';
+				reset[cssPrefixes[i]+'transition-duration'] = '';
+				reset[cssPrefixes[i]+'transition-timing-function'] = '';
+			};
+			
+			// convert translations to left & top for layout
+			if (!prop.leaveTransforms === true) {
+				var that = $(this),
+					props = that.data('cssEnhanced') || {},
+					restore = {
+						'-webkit-transform': '',
+						'-moz-transform': '',
+						'-o-transform': '',
+						'transform': ''
+					};
+
+				if (typeof props.meta !== 'undefined') {
+					restore['left'] = props.meta.left_o + 'px';
+					restore['top'] = props.meta.top_o + 'px';
 				}
 				
-				
-				// we're done, trigger the user callback
-				return opt.complete.call();
+				/**if (!$.isEmptyObject(props.secondary)) **/
+				that.css(reset).css(restore).data('translateX', 0).data('translateY', 0).data('cssEnhanced', null);
 			}
+			
+			propertyCallback();
 		},
 		easings = {
 			bounce: 'cubic-bezier(0.0, 0.35, .5, 1.3)', 
 			linear: 'linear',
-			swing: 'ease-in-out'
+			swing: 'ease-in-out',
+			easeInOutQuint: 'cubic-bezier(0.5, 0, 0, 0.8)'
 		},
-		cssProperties = {}, domProperties = null, cssEasing = "";
-		cssProperties.secondary = {}; cssMeta.top = 0; cssMeta.left = 0;
+		domProperties = null, cssEasing = "";
 		
 		// make easing css friendly
 		cssEasing = opt.easing || "swing";
@@ -141,29 +198,42 @@ Usage (exactly the same as it would be normally):
 
 		// seperate out the properties for the relevant animation functions
 		for (p in prop) {
-			var cleanVal = typeof prop[p] == "string" ? prop[p].replace(/px/g, "") : prop[p];
-			if ($.inArray(p, cssTransitionProperties) > -1 && $(this).css(p).replace(/px/g, "") !== cleanVal) {
-				$.fn.applyCSSTransition(
-					cssProperties, 
-					p, 
-					opt.duration, 
-					cssEasing, 
-					((p == "left" || p == "top") && prop.avoidTransforms === true) ? cleanVal + "px" : cleanVal, 
-					(((p == "left" || p == "top") && prop.avoidTransforms !== true) ? true : false), 
-					(prop.useTranslate3d === true) ? true : false);
-					
-				continue;
-			}	
-			if (p !== 'useTranslate3d' && p !== 'avoidTransforms' && p !== 'leaveTransforms') {
-				domProperties = (!domProperties) ? {} : domProperties;
-				domProperties[p] = prop[p];
+			if ($.inArray(p, pluginOptions) === -1) {
+				this.each(function() {
+					var that = $(this),
+						cleanVal = $.fn.interpretValue(that, prop[p], p);
+						
+					if ($.inArray(p, cssTransitionProperties) > -1 && that.css(p).replace(/px/g, "") !== cleanVal) {
+						$.fn.applyCSSTransition(
+							that,
+							p, 
+							opt.duration, 
+							cssEasing, 
+							((p == "left" || p == "top") && prop.avoidTransforms === true) ? cleanVal + "px" : cleanVal, 
+							(((p == "left" || p == "top") && prop.avoidTransforms !== true) ? true : false), 
+							(prop.useTranslate3d === true) ? true : false);
+					}
+					else {
+						domProperties = (!domProperties) ? {} : domProperties;
+						domProperties[p] = prop[p];
+					}
+				});
 			}
+			
 		}
 		
 		// clean up
-		for (var i = cssPrefixes.length - 1; i >= 0; i--){
-			if (typeof cssProperties[cssPrefixes[i]+'transition-property'] !== 'undefined') cssProperties[cssPrefixes[i]+'transition-property'] = cssProperties[cssPrefixes[i]+'transition-property'].substr(2);
-		}
+		this.each(function() {
+			var that = $(this),
+				cssProperties = that.data('cssEnhanced') || {};
+				
+			for (var i = cssPrefixes.length - 1; i >= 0; i--){
+				if (typeof cssProperties[cssPrefixes[i]+'transition-property'] !== 'undefined') cssProperties[cssPrefixes[i]+'transition-property'] = cssProperties[cssPrefixes[i]+'transition-property'].substr(2);
+			}
+			
+			that.data('cssEnhanced', cssProperties);
+		});
+		
 
 		// fire up DOM based animations
 		if (domProperties) {
@@ -171,17 +241,19 @@ Usage (exactly the same as it would be normally):
 			originalAnimateMethod.apply(this, [domProperties, opt.duration, opt.easing, propertyCallback]);
 		}
 		
+		
 		// apply the CSS transitions
-		if (!$.isEmptyObject(cssProperties.secondary)) {
-			this.each(function() {
-				var that = $(this).unbind(transitionEndEvent);
+		this.each(function() {
+			var that = $(this).unbind(transitionEndEvent);
+			if (!$.isEmptyObject(that.data('cssEnhanced').secondary)) {
 				callbackQueue++;
-				that.css(cssProperties);
+				that.css(that.data('cssEnhanced'));
 				setTimeout(function(){ 
-					that.bind(transitionEndEvent, propertyCallback).css(cssProperties.secondary);
+					that.bind(transitionEndEvent, cssCallback).css(that.data('cssEnhanced').secondary);
 				});
-			});
-		}
+			}
+		});
+	
 		
 		// over and out
 		return this;
