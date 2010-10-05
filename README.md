@@ -12,6 +12,19 @@ Properties supported: (more to come)
 
 Note that any properties not mentioned above will simply be handled by the standard jQuery $.animate() method. This plugin adds new functionality without taking any away.
 
+
+OCTOBER 2010 - Changelog
+-----------------
+* Iterate over multiple elements and store transforms in $.data per element
+* Include support for relative values (+= / -=)
+* Better unit sanitization (string, integer, 'px') etc
+* Several Performance tweaks
+* Bug fix: for optional callback function (was required)
+* Applies data[translateX] and data[translateY] to elements for easy access
+* Added 'easeInOutQuint' easing function for CSS transitions (requires jQuery UI for JS anims)
+* Less need for leaveTransforms = true due to better position detections
+
+
 Demo
 -----------------
 Simple animation demo and documentation found here: http://playground.benbarnett.net/jquery-animate-enhanced/
