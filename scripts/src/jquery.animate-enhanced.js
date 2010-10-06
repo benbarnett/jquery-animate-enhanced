@@ -1,5 +1,5 @@
 /************************************************
-	jquery.animate-enhanced plugin v0.4
+	jquery.animate-enhanced plugin v0.45
 	Author: www.benbarnett.net || @benpbarnett
 *************************************************
 
@@ -20,6 +20,9 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.45 (06/10/2010):
+		- 'Zero' position bug fix (was originally translating by 0 zero pixels, i.e. no movement)
+
 	0.4 (05/10/2010):
 		- Iterate over multiple elements and store transforms in $.data perelement
 		- Include support for relative values (+= / -=)
@@ -108,6 +111,13 @@ Changelog:
 			meta[property] = value;
 			meta[property+'_o'] = e.css(property) == "auto" ? 0 + value : parseInt(e.css(property).replace(/px/g, ''), 10) + value || 0;
 			e.data('cssEnhanced').meta = meta;
+			
+			// fix 0 issue (transition by 0 = nothing)
+			if (isTransform && value === 0) {
+				value = 0 - meta[property+'_o'];
+				meta[property] = value;
+				meta[property+'_o'] = 0;
+			}
 		}
 		
 		return e.data('cssEnhanced', $.fn.applyCSSWithPrefix(e.data('cssEnhanced'), property, duration, easing, value, isTransform, use3D));
@@ -142,26 +152,25 @@ Changelog:
 		callbackQueue = 0;
 		
 		var opt = speed && typeof speed === "object" ? speed : {
-			complete: callback || !callback && easing ||
-				$.isFunction( speed ) && speed,
+			complete: callback || !callback && easing || $.isFunction( speed ) && speed,
 			duration: speed,
 			easing: callback && easing || easing && !$.isFunction(easing) && easing
 		}, 	
-			propertyCallback = function() {	
-				callbackQueue--;
-				if (callbackQueue <= 0) { 			
-					// we're done, trigger the user callback
-					if (typeof opt.complete === 'function') return opt.complete.call();
-				}
-			},
-			cssCallback = function() {
+		propertyCallback = function() {	
+			callbackQueue--;
+			if (callbackQueue <= 0) { 			
+				// we're done, trigger the user callback
+				if (typeof opt.complete === 'function') return opt.complete.call();
+			}
+		},
+		cssCallback = function() {
 			var reset = {};
 			for (var i = cssPrefixes.length - 1; i >= 0; i--){
 				reset[cssPrefixes[i]+'transition-property'] = 'none';
 				reset[cssPrefixes[i]+'transition-duration'] = '';
 				reset[cssPrefixes[i]+'transition-timing-function'] = '';
 			};
-			
+		
 			// convert translations to left & top for layout
 			if (!prop.leaveTransforms === true) {
 				var that = $(this),
@@ -177,11 +186,11 @@ Changelog:
 					restore['left'] = props.meta.left_o + 'px';
 					restore['top'] = props.meta.top_o + 'px';
 				}
-				
-				/**if (!$.isEmptyObject(props.secondary)) **/
+			
 				that.css(reset).css(restore).data('translateX', 0).data('translateY', 0).data('cssEnhanced', null);
 			}
 			
+			// run the main callback function
 			propertyCallback();
 		},
 		easings = {
@@ -219,7 +228,6 @@ Changelog:
 					}
 				});
 			}
-			
 		}
 		
 		// clean up
