@@ -1,5 +1,5 @@
 /************************************************
-	jquery.animate-enhanced plugin v0.45
+	jquery.animate-enhanced plugin v0.46
 	Author: www.benbarnett.net || @benpbarnett
 *************************************************
 
@@ -20,6 +20,9 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.46 (07/10/2010);
+		- Compatible with .slideUp(), .slideDown(), .slideToggle()
+
 	0.45 (06/10/2010):
 		- 'Zero' position bug fix (was originally translating by 0 zero pixels, i.e. no movement)
 
@@ -80,11 +83,10 @@ Changelog:
 			if (parts[1]) {
 				end = ((parts[1] === "-=" ? -1 : 1) * end) + parseInt(cleanStart, 10);
 			}
-
+			
 			return end;
-
 		} else {
-			return clean;
+			return cleanStart;
 		}
 	};
 	
