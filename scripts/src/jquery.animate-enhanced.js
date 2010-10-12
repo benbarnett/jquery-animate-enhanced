@@ -1,5 +1,5 @@
 /************************************************
-	jquery.animate-enhanced plugin v0.46
+	jquery.animate-enhanced plugin v0.47
 	Author: www.benbarnett.net || @benpbarnett
 *************************************************
 
@@ -20,6 +20,11 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.47 (12/10/2010);
+		- Compatible with .fadeIn(), .fadeOut()
+		- Use shortcuts, no duration for jQuery default or "fast" and "slow"
+		- Clean up callback event listeners on complete (preventing multiple callbacks)
+
 	0.46 (07/10/2010);
 		- Compatible with .slideUp(), .slideDown(), .slideToggle()
 
@@ -27,7 +32,7 @@ Changelog:
 		- 'Zero' position bug fix (was originally translating by 0 zero pixels, i.e. no movement)
 
 	0.4 (05/10/2010):
-		- Iterate over multiple elements and store transforms in $.data perelement
+		- Iterate over multiple elements and store transforms in $.data per element
 		- Include support for relative values (+= / -=)
 		- Better unit sanitization
 		- Performance tweaks
@@ -66,7 +71,7 @@ Changelog:
 	// ----------
 	// Interpret value ("px", "+=" and "-=" sanitisation)
 	// ----------
-	$.fn.interpretValue = function(e, val, prop) {
+	$.fn.interpretValue = function(e, val, prop) {		
 		var parts = rfxnum.exec(val),
 			start = e.css(prop) === "auto" ? 0 : e.css(prop),
 			cleanCSSStart = typeof start == "string" ? start.replace(/px/g, "") : start,
@@ -75,7 +80,7 @@ Changelog:
 			
 		if (prop == "left" && e.data('translateX')) cleanStart = cleanCSSStart + e.data('translateX');
 		if (prop == "top" && e.data('translateY')) cleanStart = cleanCSSStart + e.data('translateY');
-		
+
 		if (parts) {
 			var end = parseFloat(parts[2]);
 
@@ -153,6 +158,10 @@ Changelog:
 		
 		callbackQueue = 0;
 		
+		// get default jquery timing from shortcuts
+		speed = typeof speed === 'undefined' ? "_default" : speed;
+		if (typeof $.fx.speeds[speed] !== 'undefined') speed = $.fx.speeds[speed];
+		
 		var opt = speed && typeof speed === "object" ? speed : {
 			complete: callback || !callback && easing || $.isFunction( speed ) && speed,
 			duration: speed,
@@ -189,7 +198,13 @@ Changelog:
 					restore['top'] = props.meta.top_o + 'px';
 				}
 			
-				that.css(reset).css(restore).data('translateX', 0).data('translateY', 0).data('cssEnhanced', null);
+				that.
+					unbind(transitionEndEvent).
+					css(reset).
+					css(restore).
+					data('translateX', 0).
+					data('translateY', 0).
+					data('cssEnhanced', null);
 			}
 			
 			// run the main callback function
@@ -255,12 +270,14 @@ Changelog:
 		// apply the CSS transitions
 		this.each(function() {
 			var that = $(this).unbind(transitionEndEvent);
-			if (!$.isEmptyObject(that.data('cssEnhanced').secondary)) {
-				callbackQueue++;
-				that.css(that.data('cssEnhanced'));
-				setTimeout(function(){ 
-					that.bind(transitionEndEvent, cssCallback).css(that.data('cssEnhanced').secondary);
-				});
+			if (!$.isEmptyObject(that.data('cssEnhanced'))) {
+				if (!$.isEmptyObject(that.data('cssEnhanced').secondary)) {
+					callbackQueue++;
+					that.css(that.data('cssEnhanced'));
+					setTimeout(function(){ 
+						that.bind(transitionEndEvent, cssCallback).css(that.data('cssEnhanced').secondary);
+					});
+				}
 			}
 		});
 	
