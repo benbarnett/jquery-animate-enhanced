@@ -71,15 +71,22 @@ Changelog:
 	// ----------
 	// Interpret value ("px", "+=" and "-=" sanitisation)
 	// ----------
-	$.fn.interpretValue = function(e, val, prop) {		
+	$.fn.interpretValue = function(e, val, prop) {	
 		var parts = rfxnum.exec(val),
 			start = e.css(prop) === "auto" ? 0 : e.css(prop),
 			cleanCSSStart = typeof start == "string" ? start.replace(/px/g, "") : start,
 			cleanTarget = typeof val == "string" ? val.replace(/px/g, "") : val,
-			cleanStart = 0;
+			cleanStart = 0,
+			hidden = jQuery(e).is(":hidden");
 			
 		if (prop == "left" && e.data('translateX')) cleanStart = cleanCSSStart + e.data('translateX');
 		if (prop == "top" && e.data('translateY')) cleanStart = cleanCSSStart + e.data('translateY');
+		
+		// deal with shortcuts
+		if (!parts && val == "show") {
+			cleanStart = 1;
+			if (hidden) e.css({'display':'block', 'opacity': 0});
+		}
 
 		if (parts) {
 			var end = parseFloat(parts[2]);
@@ -229,7 +236,7 @@ Changelog:
 					var that = $(this),
 						cleanVal = $.fn.interpretValue(that, prop[p], p);
 						
-					if ($.inArray(p, cssTransitionProperties) > -1 && that.css(p).replace(/px/g, "") !== cleanVal) {
+					if ($.inArray(p, cssTransitionProperties) > -1 && that.css(p).replace(/px/g, "") !== cleanVal) {						
 						$.fn.applyCSSTransition(
 							that,
 							p, 
