@@ -1,7 +1,6 @@
 /************************************************
 	jquery.animate-enhanced plugin v0.49
-	Author:  www.benbarnett.net || @benpbarnett
-	Credits: Ralf Santbergen for his testing & support
+	Author: www.benbarnett.net || @benpbarnett
 *************************************************
 
 Extends jQuery.animate() to automatically use CSS3 transformations where applicable.
@@ -26,7 +25,6 @@ Changelog:
 	0.49 (19/10/2010):
 		- Support to enhance 'width' and 'height' properties
 		- Bugfix: Positioning when using avoidTransforms: true (thanks Ralf Santbergen)
-		- Bugfix: Multiple $.animate calls with variable callbacks fixed (scope issues, thanks Ralf)
 
 	0.48 (13/10/2010):
 		- Checks for 3d support before applying
@@ -173,6 +171,8 @@ Changelog:
 	jQuery.fn.animate = function(prop, speed, easing, callback) {
 		if (!cssTransitionsSupported || jQuery.isEmptyObject(prop)) return originalAnimateMethod.apply(this, arguments);
 		
+		callbackQueue = 0;
+		
 		// get default jquery timing from shortcuts
 		speed = typeof speed === 'undefined' ? "_default" : speed;
 		if (typeof jQuery.fx.speeds[speed] !== 'undefined') speed = jQuery.fx.speeds[speed];
@@ -181,7 +181,7 @@ Changelog:
 			complete: callback || !callback && easing || jQuery.isFunction( speed ) && speed,
 			duration: speed,
 			easing: callback && easing || easing && !jQuery.isFunction(easing) && easing
-		}, 
+		}, 	
 		callbackQueue = 0,
 		propertyCallback = function() {	
 			callbackQueue--;
@@ -258,7 +258,6 @@ Changelog:
 					else {
 						domProperties = (!domProperties) ? {} : domProperties;
 						domProperties[p] = prop[p];
-						that.data('domProperties', domProperties);
 					}
 				});
 			}
@@ -277,17 +276,16 @@ Changelog:
 		});
 		
 
+		// fire up DOM based animations
+		if (domProperties) {
+			callbackQueue++;
+			originalAnimateMethod.apply(this, [domProperties, opt.duration, opt.easing, propertyCallback]);
+		}
 		
+		
+		// apply the CSS transitions
 		this.each(function() {
 			var that = $(this).unbind(transitionEndEvent);
-			
-			// apply the DOM properties
-			if (!jQuery.isEmptyObject(that.data('domProperties'))) {
-				callbackQueue++;
-				originalAnimateMethod.apply(this, [that.data('domProperties'), opt.duration, opt.easing, propertyCallback]);
-			}
-			
-			// apply the CSS transitions
 			if (!jQuery.isEmptyObject(that.data('cssEnhanced'))) {
 				if (!jQuery.isEmptyObject(that.data('cssEnhanced').secondary)) {
 					callbackQueue++;
