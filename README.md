@@ -9,12 +9,18 @@ Properties supported: (more to come)
 * left : using translate(x, y) or translate3d(x, y, z)
 * top : using translate(x, y) or translate3d(x, y, z)
 * opacity
+* width
+* height
 
 Note that any properties not mentioned above will simply be handled by the standard jQuery $.animate() method. This plugin adds new functionality without taking any away.
 
 
 OCTOBER 2010 - Changelog
 -----------------
+* Support to enhance 'width' and 'height' properties
+* Use shortcuts, no duration for jQuery default or "fast" and "slow"
+* Compatible with .fadeIn(), .fadeOut(), .slideUp(), .slideDown(), .slideToggle()
+* Checks for 3d support before applying
 * Iterate over multiple elements and store transforms in $.data per element
 * Include support for relative values (+= / -=)
 * Better unit sanitization (string, integer, 'px') etc
