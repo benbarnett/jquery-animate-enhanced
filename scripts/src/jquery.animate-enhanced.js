@@ -24,9 +24,9 @@ Usage (exactly the same as it would be normally):
 Changelog:
 	0.49 (19/10/2010):
 		- Handling of 'undefined' errors for secondary CSS objects
-		- Support to enhance 'width' and 'height' properties
-		- Bugfix: Positioning when using avoidTransforms: true (thanks Ralf Santbergen for reports)
-		- Bugfix: Callbacks and Scope issues (thanks Ralf Santbergen for reports)
+		- Support to enhance 'width' and 'height' properties (except shortcuts involving $.fx.step, e.g slideToggle)
+		- Bugfix: Positioning when using avoidTransforms: true (thanks Ralf Santbergen reports)
+		- Bugfix: Callbacks and Scope issues
 
 	0.48 (13/10/2010):
 		- Checks for 3d support before applying
@@ -144,6 +144,8 @@ Changelog:
 			}
 		}
 
+		if (property === 'height') console.log(e, property, value);
+
 		return e.data('cssEnhanced', jQuery.fn.applyCSSWithPrefix(e.data('cssEnhanced'), property, duration, easing, value, isTransform, use3D));
 	};
 	
@@ -164,6 +166,15 @@ Changelog:
 		};
 		
 		return cssProperties;
+	};
+	
+	
+	// ----------
+	// Shortcut to detect if we need to step away from slideToggle 
+	// CSS accelerated transitions (to come later with fx.step support)
+	// ----------
+	jQuery.fn.isBoxShortcut = function(value, property) {
+		return (property == "width" || property == "height") && (value == "show" || value == "hide" || value == "toggle");
 	};
 	
 	
@@ -247,7 +258,10 @@ Changelog:
 					var that = $(this),
 						cleanVal = jQuery.fn.interpretValue(that, prop[p], p, (((p == "left" || p == "top") && prop.avoidTransforms !== true) ? true : false));
 						
-					if (jQuery.inArray(p, cssTransitionProperties) > -1 && that.css(p).replace(/px/g, "") !== cleanVal) {						
+					if (jQuery.inArray(p, cssTransitionProperties) > -1 && 
+						that.css(p).replace(/px/g, "") !== cleanVal &&
+						!jQuery.fn.isBoxShortcut(prop[p], p)
+						) {						
 						jQuery.fn.applyCSSTransition(
 							that,
 							p, 
