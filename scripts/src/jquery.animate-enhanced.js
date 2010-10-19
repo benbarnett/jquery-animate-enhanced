@@ -1,9 +1,10 @@
 /************************************************
-	jquery.animate-enhanced plugin v0.47
-	Author: www.benbarnett.net || @benpbarnett
+	jquery.animate-enhanced plugin v0.49
+	Author:  www.benbarnett.net || @benpbarnett
+	Credits: Ralf Santbergen for his testing & support
 *************************************************
 
-Extends $.animate() to automatically use CSS3 transformations where applicable.
+Extends jQuery.animate() to automatically use CSS3 transformations where applicable.
 Requires jQuery 1.4.2+
 
 Supports -moz-transition, -webkit-transition, -o-transition, transition
@@ -12,6 +13,8 @@ Targetted properties (for now):
 	- left
 	- top
 	- opacity
+	- width
+	- height
 	
 Usage (exactly the same as it would be normally):
 	
@@ -20,6 +23,14 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.49 (19/10/2010):
+		- Support to enhance 'width' and 'height' properties
+		- Bugfix: Positioning when using avoidTransforms: true (thanks Ralf Santbergen)
+		- Bugfix: Multiple $.animate calls with variable callbacks fixed (scope issues, thanks Ralf)
+
+	0.48 (13/10/2010):
+		- Checks for 3d support before applying
+
 	0.47 (12/10/2010);
 		- Compatible with .fadeIn(), .fadeOut()
 		- Use shortcuts, no duration for jQuery default or "fast" and "slow"
@@ -32,7 +43,7 @@ Changelog:
 		- 'Zero' position bug fix (was originally translating by 0 zero pixels, i.e. no movement)
 
 	0.4 (05/10/2010):
-		- Iterate over multiple elements and store transforms in $.data per element
+		- Iterate over multiple elements and store transforms in jQuery.data per element
 		- Include support for relative values (+= / -=)
 		- Better unit sanitization
 		- Performance tweaks
@@ -49,11 +60,11 @@ Changelog:
 	// Plugin variables
 	// ----------
 	var cssTransitionsSupported = false,
-		originalAnimateMethod = $.fn.animate,
-		cssTransitionProperties = ["top", "left", "opacity"],
+		originalAnimateMethod = jQuery.fn.animate,
+		has3D = ('WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix()),
+		cssTransitionProperties = ["top", "left", "opacity", "height", "width"],
 		cssPrefixes = ["", "-webkit-", "-moz-", "-o-"],
 		pluginOptions = ["avoidTransforms", "useTranslate3d", "leaveTransforms"],
-		callbackQueue = 0,
 		rfxnum = /^([+-]=)?([\d+-.]+)(.*)$/;
 		
 		
@@ -71,14 +82,14 @@ Changelog:
 	// ----------
 	// Interpret value ("px", "+=" and "-=" sanitisation)
 	// ----------
-	$.fn.interpretValue = function(e, val, prop) {	
+	jQuery.fn.interpretValue = function(e, val, prop, isTransform) {	
 		var parts = rfxnum.exec(val),
 			start = e.css(prop) === "auto" ? 0 : e.css(prop),
 			cleanCSSStart = typeof start == "string" ? start.replace(/px/g, "") : start,
 			cleanTarget = typeof val == "string" ? val.replace(/px/g, "") : val,
-			cleanStart = 0,
+			cleanStart = isTransform === true ? 0 : cleanCSSStart,
 			hidden = jQuery(e).is(":hidden");
-			
+
 		if (prop == "left" && e.data('translateX')) cleanStart = cleanCSSStart + e.data('translateX');
 		if (prop == "top" && e.data('translateY')) cleanStart = cleanCSSStart + e.data('translateY');
 		
@@ -95,7 +106,6 @@ Changelog:
 			if (parts[1]) {
 				end = ((parts[1] === "-=" ? -1 : 1) * end) + parseInt(cleanStart, 10);
 			}
-			
 			return end;
 		} else {
 			return cleanStart;
@@ -106,15 +116,15 @@ Changelog:
 	// ----------
 	// Make a translate or translate3d string
 	// ----------
-	$.fn.getTranslation = function(x, y, use3D) {
-		return (use3D === true) ? "translate3d("+x+"px,"+y+"px,0)" : "translate("+x+"px,"+y+"px)";
+	jQuery.fn.getTranslation = function(x, y, use3D) {
+		return (use3D === true && has3D) ? "translate3d("+x+"px,"+y+"px,0)" : "translate("+x+"px,"+y+"px)";
 	};
 	
 	
 	// ----------
 	// Build up the CSS object
 	// ----------
-	$.fn.applyCSSTransition = function(e, property, duration, easing, value, isTransform, use3D) {
+	jQuery.fn.applyCSSTransition = function(e, property, duration, easing, value, isTransform, use3D) {
 		if (!e.data('cssEnhanced')) {
 			var setup = { secondary: {}, meta: { left: 0, top: 0 } };
 			e.data('cssEnhanced', setup);
@@ -133,15 +143,15 @@ Changelog:
 				meta[property+'_o'] = 0;
 			}
 		}
-		
-		return e.data('cssEnhanced', $.fn.applyCSSWithPrefix(e.data('cssEnhanced'), property, duration, easing, value, isTransform, use3D));
+
+		return e.data('cssEnhanced', jQuery.fn.applyCSSWithPrefix(e.data('cssEnhanced'), property, duration, easing, value, isTransform, use3D));
 	};
 	
 	
 	// ----------
 	// Helper function to build up CSS properties using the various prefixes
 	// ----------
-	$.fn.applyCSSWithPrefix = function(cssProperties, property, duration, easing, value, isTransform, use3D) {
+	jQuery.fn.applyCSSWithPrefix = function(cssProperties, property, duration, easing, value, isTransform, use3D) {
 		cssProperties = typeof cssProperties === 'undefined' ? {} : cssProperties;
 		cssProperties.secondary = typeof cssProperties.secondary === 'undefined' ? {} : cssProperties.secondary;
 		
@@ -150,7 +160,7 @@ Changelog:
 			cssProperties[cssPrefixes[i]+'transition-property'] += ', ' + ((isTransform === true) ? cssPrefixes[i] + 'transform' : property);
 			cssProperties[cssPrefixes[i]+'transition-duration'] = duration + 'ms';
 			cssProperties[cssPrefixes[i]+'transition-timing-function'] = easing;
-			cssProperties.secondary[((isTransform === true) ? cssPrefixes[i]+'transform' : property)] = (isTransform === true) ? $.fn.getTranslation(cssProperties.meta.left, cssProperties.meta.top, use3D) : value;
+			cssProperties.secondary[((isTransform === true) ? cssPrefixes[i]+'transform' : property)] = (isTransform === true) ? jQuery.fn.getTranslation(cssProperties.meta.left, cssProperties.meta.top, use3D) : value;
 		};
 		
 		return cssProperties;
@@ -158,22 +168,21 @@ Changelog:
 	
 	
 	// ----------
-	// The new $.animate() function
+	// The new jQuery.animate() function
 	// ----------
-	$.fn.animate = function(prop, speed, easing, callback) {
-		if (!cssTransitionsSupported || $.isEmptyObject(prop)) return originalAnimateMethod.apply(this, arguments);
-		
-		callbackQueue = 0;
+	jQuery.fn.animate = function(prop, speed, easing, callback) {
+		if (!cssTransitionsSupported || jQuery.isEmptyObject(prop)) return originalAnimateMethod.apply(this, arguments);
 		
 		// get default jquery timing from shortcuts
 		speed = typeof speed === 'undefined' ? "_default" : speed;
-		if (typeof $.fx.speeds[speed] !== 'undefined') speed = $.fx.speeds[speed];
+		if (typeof jQuery.fx.speeds[speed] !== 'undefined') speed = jQuery.fx.speeds[speed];
 		
 		var opt = speed && typeof speed === "object" ? speed : {
-			complete: callback || !callback && easing || $.isFunction( speed ) && speed,
+			complete: callback || !callback && easing || jQuery.isFunction( speed ) && speed,
 			duration: speed,
-			easing: callback && easing || easing && !$.isFunction(easing) && easing
-		}, 	
+			easing: callback && easing || easing && !jQuery.isFunction(easing) && easing
+		}, 
+		callbackQueue = 0,
 		propertyCallback = function() {	
 			callbackQueue--;
 			if (callbackQueue <= 0) { 			
@@ -204,7 +213,7 @@ Changelog:
 					restore['left'] = props.meta.left_o + 'px';
 					restore['top'] = props.meta.top_o + 'px';
 				}
-			
+				
 				that.
 					unbind(transitionEndEvent).
 					css(reset).
@@ -231,13 +240,13 @@ Changelog:
 
 		// seperate out the properties for the relevant animation functions
 		for (p in prop) {
-			if ($.inArray(p, pluginOptions) === -1) {
+			if (jQuery.inArray(p, pluginOptions) === -1) {
 				this.each(function() {
 					var that = $(this),
-						cleanVal = $.fn.interpretValue(that, prop[p], p);
+						cleanVal = jQuery.fn.interpretValue(that, prop[p], p, (((p == "left" || p == "top") && prop.avoidTransforms !== true) ? true : false));
 						
-					if ($.inArray(p, cssTransitionProperties) > -1 && that.css(p).replace(/px/g, "") !== cleanVal) {						
-						$.fn.applyCSSTransition(
+					if (jQuery.inArray(p, cssTransitionProperties) > -1 && that.css(p).replace(/px/g, "") !== cleanVal) {						
+						jQuery.fn.applyCSSTransition(
 							that,
 							p, 
 							opt.duration, 
@@ -249,6 +258,7 @@ Changelog:
 					else {
 						domProperties = (!domProperties) ? {} : domProperties;
 						domProperties[p] = prop[p];
+						that.data('domProperties', domProperties);
 					}
 				});
 			}
@@ -267,18 +277,19 @@ Changelog:
 		});
 		
 
-		// fire up DOM based animations
-		if (domProperties) {
-			callbackQueue++;
-			originalAnimateMethod.apply(this, [domProperties, opt.duration, opt.easing, propertyCallback]);
-		}
 		
-		
-		// apply the CSS transitions
 		this.each(function() {
 			var that = $(this).unbind(transitionEndEvent);
-			if (!$.isEmptyObject(that.data('cssEnhanced'))) {
-				if (!$.isEmptyObject(that.data('cssEnhanced').secondary)) {
+			
+			// apply the DOM properties
+			if (!jQuery.isEmptyObject(that.data('domProperties'))) {
+				callbackQueue++;
+				originalAnimateMethod.apply(this, [that.data('domProperties'), opt.duration, opt.easing, propertyCallback]);
+			}
+			
+			// apply the CSS transitions
+			if (!jQuery.isEmptyObject(that.data('cssEnhanced'))) {
+				if (!jQuery.isEmptyObject(that.data('cssEnhanced').secondary)) {
 					callbackQueue++;
 					that.css(that.data('cssEnhanced'));
 					setTimeout(function(){ 
