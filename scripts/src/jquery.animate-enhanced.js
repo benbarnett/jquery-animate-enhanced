@@ -143,9 +143,7 @@ Changelog:
 				meta[property+'_o'] = 0;
 			}
 		}
-
-		if (property === 'height') console.log(e, property, value);
-
+		
 		return e.data('cssEnhanced', jQuery.fn.applyCSSWithPrefix(e.data('cssEnhanced'), property, duration, easing, value, isTransform, use3D));
 	};
 	
