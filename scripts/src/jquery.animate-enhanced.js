@@ -1,6 +1,8 @@
 /************************************************
 	jquery.animate-enhanced plugin v0.49
 	Author: www.benbarnett.net || @benpbarnett
+
+	Thanks to Ralf Santbergen for his testing & bug reports
 *************************************************
 
 Extends jQuery.animate() to automatically use CSS3 transformations where applicable.
@@ -24,7 +26,8 @@ Usage (exactly the same as it would be normally):
 Changelog:
 	0.49 (19/10/2010):
 		- Support to enhance 'width' and 'height' properties
-		- Bugfix: Positioning when using avoidTransforms: true (thanks Ralf Santbergen)
+		- Bugfix: Positioning when using avoidTransforms: true (thanks Ralf Santbergen reports)
+		- Bugfix: Callbacks and Scope issues
 
 	0.48 (13/10/2010):
 		- Checks for 3d support before applying
