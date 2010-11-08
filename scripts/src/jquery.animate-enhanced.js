@@ -1,5 +1,5 @@
 /************************************************
-	jquery.animate-enhanced plugin v0.50
+	jquery.animate-enhanced plugin v0.51
 	Author: www.benbarnett.net || @benpbarnett
 *************************************************
 
@@ -22,6 +22,9 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.51 (08/11/2010):
+		- Bailing out with jQuery UI. This is only so the plugin plays nice with others and is TEMPORARY.
+	
 	0.50 (08/11/2010):
 		- Support for $.fn.stop()
 		- Fewer jQuery.fn entries to preserve namespace
@@ -61,13 +64,11 @@ Changelog:
 	
 *********/
 
-(function($) {
+(function($, originalAnimateMethod, originalStopMethod) {
 	// ----------
 	// Plugin variables
 	// ----------
-	var originalAnimateMethod = jQuery.fn.animate,
-		originalStopMethod = jQuery.fn.stop,
-		cssTransitionProperties = ["top", "left", "opacity", "height", "width"],
+	var	cssTransitionProperties = ["top", "left", "opacity", "height", "width"],
 		cssPrefixes = ["", "-webkit-", "-moz-", "-o-"],
 		pluginOptions = ["avoidTransforms", "useTranslate3d", "leaveTransforms"],
 		rfxnum = /^([+-]=)?([\d+-.]+)(.*)$/,
@@ -226,7 +227,7 @@ Changelog:
 		@param {function} [callback]
 	*/
 	jQuery.fn.animate = function(prop, speed, easing, callback) {
-		if (!cssTransitionsSupported || jQuery.isEmptyObject(prop)) return originalAnimateMethod.apply(this, arguments);
+		if (typeof jQuery.ui !== undefined || !cssTransitionsSupported || jQuery.isEmptyObject(prop)) return originalAnimateMethod.apply(this, arguments);
 
 		// get default jquery timing from shortcuts
 		speed = typeof speed === 'undefined' || speed == 'def' ? "_default" : speed;
@@ -369,7 +370,7 @@ Changelog:
 		@param {boolean} [leaveTransforms] Leave transforms/translations as they are? Default: false (reset translations to calculated explicit left/top props)
 	*/
 	jQuery.fn.stop = function(clearQueue, gotoEnd, leaveTransforms) {
-		if (!cssTransitionsSupported) return originalStopMethod.apply(this, [clearQueue, gotoEnd]);
+		if (typeof jQuery.ui !== undefined || !cssTransitionsSupported) return originalStopMethod.apply(this, [clearQueue, gotoEnd]);
 		
 		// clear the queue?
 		if (clearQueue) {
@@ -449,4 +450,4 @@ Changelog:
 		
 		return this;
 	};
-})(jQuery);
+})(jQuery, jQuery.fn.animate, jQuery.fn.stop);
