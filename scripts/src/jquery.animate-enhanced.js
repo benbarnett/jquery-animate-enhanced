@@ -370,7 +370,7 @@ Changelog:
 		@param {boolean} [leaveTransforms] Leave transforms/translations as they are? Default: false (reset translations to calculated explicit left/top props)
 	*/
 	jQuery.fn.stop = function(clearQueue, gotoEnd, leaveTransforms) {
-		if (typeof jQuery.ui !== undefined || !cssTransitionsSupported) return originalStopMethod.apply(this, [clearQueue, gotoEnd]);
+		if (typeof jQuery.ui !== 'undefined' || !cssTransitionsSupported) return originalStopMethod.apply(this, [clearQueue, gotoEnd]);
 		
 		// clear the queue?
 		if (clearQueue) {
