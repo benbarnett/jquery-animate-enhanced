@@ -1,5 +1,5 @@
 /************************************************
-	jquery.animate-enhanced plugin v0.49
+	jquery.animate-enhanced plugin v0.50
 	Author: www.benbarnett.net || @benpbarnett
 *************************************************
 
@@ -17,14 +17,20 @@ Targetted properties (for now):
 	
 Usage (exactly the same as it would be normally):
 	
-	$(element).animate({left: 200},  500, function() {
+	jQuery(element).animate({left: 200},  500, function() {
 		// callback
 	});
 	
 Changelog:
+	0.50 (08/11/2010):
+		- Support for $.fn.stop()
+		- Fewer jQuery.fn entries to preserve namespace
+		- All references $ converted to jQuery
+		- jsDoc Toolkit style commenting for docs (coming soon)
+
 	0.49 (19/10/2010):
 		- Handling of 'undefined' errors for secondary CSS objects
-		- Support to enhance 'width' and 'height' properties (except shortcuts involving $.fx.step, e.g slideToggle)
+		- Support to enhance 'width' and 'height' properties (except shortcuts involving jQuery.fx.step, e.g slideToggle)
 		- Bugfix: Positioning when using avoidTransforms: true (thanks Ralf Santbergen reports)
 		- Bugfix: Callbacks and Scope issues
 
@@ -59,14 +65,13 @@ Changelog:
 	// ----------
 	// Plugin variables
 	// ----------
-	var cssTransitionsSupported = false,
-		originalAnimateMethod = jQuery.fn.animate,
-		has3D = ('WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix()),
+	var originalAnimateMethod = jQuery.fn.animate,
+		originalStopMethod = jQuery.fn.stop,
 		cssTransitionProperties = ["top", "left", "opacity", "height", "width"],
 		cssPrefixes = ["", "-webkit-", "-moz-", "-o-"],
 		pluginOptions = ["avoidTransforms", "useTranslate3d", "leaveTransforms"],
-		rfxnum = /^([+-]=)?([\d+-.]+)(.*)$/;
-		
+		rfxnum = /^([+-]=)?([\d+-.]+)(.*)$/,
+		rupper = /([A-Z])/g;
 		
 	
 	// ----------
@@ -74,15 +79,22 @@ Changelog:
 	// ----------
 	var thisBody = document.body || document.documentElement,
    		thisStyle = thisBody.style,
-		transitionEndEvent = (thisStyle.WebkitTransition !== undefined) ? "webkitTransitionEnd" : (thisStyle.OTransition !== undefined) ? "oTransitionEnd" : "transitionend";
+		transitionEndEvent = (thisStyle.WebkitTransition !== undefined) ? "webkitTransitionEnd" : (thisStyle.OTransition !== undefined) ? "oTransitionEnd" : "transitionend",
+		cssTransitionsSupported = thisStyle.WebkitTransition !== undefined || thisStyle.MozTransition !== undefined || thisStyle.OTransition !== undefined || thisStyle.transition !== undefined,
+		has3D = ('WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix());
 	
-	cssTransitionsSupported = thisStyle.WebkitTransition !== undefined || thisStyle.MozTransition !== undefined || thisStyle.OTransition !== undefined || thisStyle.transition !== undefined;
 	
-	
-	// ----------
-	// Interpret value ("px", "+=" and "-=" sanitisation)
-	// ----------
-	jQuery.fn.interpretValue = function(e, val, prop, isTransform) {	
+	/**
+		@private
+		@name interpretValue
+		@function
+		@description Interpret value ("px", "+=" and "-=" sanitisation)
+		@param {object} [element] The Element for current CSS analysis
+		@param {variant} [val] Target value
+		@param {string} [prop] The property we're looking at
+		@param {boolean} [isTransform] Is this a CSS3 transform?
+	*/
+	var interpretValue = function(e, val, prop, isTransform) {	
 		var parts = rfxnum.exec(val),
 			start = e.css(prop) === "auto" ? 0 : e.css(prop),
 			cleanCSSStart = typeof start == "string" ? start.replace(/px/g, "") : start,
@@ -112,19 +124,34 @@ Changelog:
 		}
 	};
 	
-	
-	// ----------
-	// Make a translate or translate3d string
-	// ----------
-	jQuery.fn.getTranslation = function(x, y, use3D) {
+	/**
+		@private
+		@name getTranslation
+		@function
+		@description Make a translate or translate3d string
+		@param {integer} [x] 
+		@param {integer} [y] 
+		@param {boolean} [use3D] Use translate3d if available?
+	*/
+	var getTranslation = function(x, y, use3D) {
 		return (use3D === true && has3D) ? "translate3d("+x+"px,"+y+"px,0)" : "translate("+x+"px,"+y+"px)";
 	};
 	
 	
-	// ----------
-	// Build up the CSS object
-	// ----------
-	jQuery.fn.applyCSSTransition = function(e, property, duration, easing, value, isTransform, use3D) {
+	/**
+		@private
+		@name applyCSSTransition
+		@function
+		@description Build up the CSS object
+		@param {object} [e] 
+		@param {string} [property]
+		@param {integer} [duration]
+		@param {string} [easing]
+		@param {variant} [value]
+		@param {boolean} [isTransform] Is this a CSS transformation?
+		@param {boolean} [use3D] Use translate3d if available?
+	*/
+	var applyCSSTransition = function(e, property, duration, easing, value, isTransform, use3D) {
 		if (!e.data('cssEnhanced')) {
 			var setup = { secondary: {}, meta: { left: 0, top: 0 } };
 			e.data('cssEnhanced', setup);
@@ -144,14 +171,23 @@ Changelog:
 			}
 		}
 		
-		return e.data('cssEnhanced', jQuery.fn.applyCSSWithPrefix(e.data('cssEnhanced'), property, duration, easing, value, isTransform, use3D));
+		return e.data('cssEnhanced', applyCSSWithPrefix(e.data('cssEnhanced'), property, duration, easing, value, isTransform, use3D));
 	};
 	
-	
-	// ----------
-	// Helper function to build up CSS properties using the various prefixes
-	// ----------
-	jQuery.fn.applyCSSWithPrefix = function(cssProperties, property, duration, easing, value, isTransform, use3D) {
+	/**
+		@private
+		@name applyCSSWithPrefix
+		@function
+		@description Helper function to build up CSS properties using the various prefixes
+		@param {object} [cssProperties] Current CSS object to merge with
+		@param {string} [property]
+		@param {integer} [duration]
+		@param {string} [easing]
+		@param {variant} [value]
+		@param {boolean} [isTransform] Is this a CSS transformation?
+		@param {boolean} [use3D] Use translate3d if available?
+	*/
+	var applyCSSWithPrefix = function(cssProperties, property, duration, easing, value, isTransform, use3D) {
 		cssProperties = typeof cssProperties === 'undefined' ? {} : cssProperties;
 		cssProperties.secondary = typeof cssProperties.secondary === 'undefined' ? {} : cssProperties.secondary;
 		
@@ -160,32 +196,40 @@ Changelog:
 			cssProperties[cssPrefixes[i]+'transition-property'] += ', ' + ((isTransform === true) ? cssPrefixes[i] + 'transform' : property);
 			cssProperties[cssPrefixes[i]+'transition-duration'] = duration + 'ms';
 			cssProperties[cssPrefixes[i]+'transition-timing-function'] = easing;
-			cssProperties.secondary[((isTransform === true) ? cssPrefixes[i]+'transform' : property)] = (isTransform === true) ? jQuery.fn.getTranslation(cssProperties.meta.left, cssProperties.meta.top, use3D) : value;
+			cssProperties.secondary[((isTransform === true) ? cssPrefixes[i]+'transform' : property)] = (isTransform === true) ? getTranslation(cssProperties.meta.left, cssProperties.meta.top, use3D) : value;
 		};
 		
 		return cssProperties;
 	};
 	
-	
-	// ----------
-	// Shortcut to detect if we need to step away from slideToggle 
-	// CSS accelerated transitions (to come later with fx.step support)
-	// ----------
-	jQuery.fn.isBoxShortcut = function(value, property) {
+	/**
+		@private
+		@name isBoxShortcut
+		@function
+		@description Shortcut to detect if we need to step away from slideToggle, CSS accelerated transitions (to come later with fx.step support)
+		@param {variant} [value]
+		@param {string} [property]
+	*/
+	var isBoxShortcut = function(value, property) {
 		return (property == "width" || property == "height") && (value == "show" || value == "hide" || value == "toggle");
 	};
 	
 	
-	// ----------
-	// The new jQuery.animate() function
-	// ----------
+	/**
+		@public
+		@name jQuery.fn.animate
+		@function
+		@description The enhanced jQuery.animate function
+		@param {string} [property]
+		@param {string} [speed]
+		@param {string} [easing]
+		@param {function} [callback]
+	*/
 	jQuery.fn.animate = function(prop, speed, easing, callback) {
 		if (!cssTransitionsSupported || jQuery.isEmptyObject(prop)) return originalAnimateMethod.apply(this, arguments);
-		
-		callbackQueue = 0;
-		
+
 		// get default jquery timing from shortcuts
-		speed = typeof speed === 'undefined' ? "_default" : speed;
+		speed = typeof speed === 'undefined' || speed == 'def' ? "_default" : speed;
 		if (typeof jQuery.fx.speeds[speed] !== 'undefined') speed = jQuery.fx.speeds[speed];
 		
 		var opt = speed && typeof speed === "object" ? speed : {
@@ -211,8 +255,8 @@ Changelog:
 		
 			// convert translations to left & top for layout
 			if (!prop.leaveTransforms === true) {
-				var that = $(this),
-					props = that.data('cssEnhanced') || {},
+				var self = jQuery(this),
+					props = self.data('cssEnhanced') || {},
 					restore = {
 						'-webkit-transform': '',
 						'-moz-transform': '',
@@ -225,7 +269,7 @@ Changelog:
 					restore['top'] = props.meta.top_o + 'px';
 				}
 				
-				that.
+				self.
 					unbind(transitionEndEvent).
 					css(reset).
 					css(restore).
@@ -253,15 +297,15 @@ Changelog:
 		for (p in prop) {
 			if (jQuery.inArray(p, pluginOptions) === -1) {
 				this.each(function() {
-					var that = $(this),
-						cleanVal = jQuery.fn.interpretValue(that, prop[p], p, (((p == "left" || p == "top") && prop.avoidTransforms !== true) ? true : false));
+					var self = jQuery(this),
+						cleanVal = interpretValue(self, prop[p], p, (((p == "left" || p == "top") && prop.avoidTransforms !== true) ? true : false));
 						
 					if (jQuery.inArray(p, cssTransitionProperties) > -1 && 
-						that.css(p).replace(/px/g, "") !== cleanVal &&
-						!jQuery.fn.isBoxShortcut(prop[p], p)
+						self.css(p).replace(/px/g, "") !== cleanVal &&
+						!isBoxShortcut(prop[p], p)
 						) {						
-						jQuery.fn.applyCSSTransition(
-							that,
+						applyCSSTransition(
+							self,
 							p, 
 							opt.duration, 
 							cssEasing, 
@@ -279,14 +323,14 @@ Changelog:
 		
 		// clean up
 		this.each(function() {
-			var that = $(this),
-				cssProperties = that.data('cssEnhanced') || {};
+			var self = jQuery(this),
+				cssProperties = self.data('cssEnhanced') || {};
 				
 			for (var i = cssPrefixes.length - 1; i >= 0; i--){
 				if (typeof cssProperties[cssPrefixes[i]+'transition-property'] !== 'undefined') cssProperties[cssPrefixes[i]+'transition-property'] = cssProperties[cssPrefixes[i]+'transition-property'].substr(2);
 			}
 			
-			that.data('cssEnhanced', cssProperties);
+			self.data('cssEnhanced', cssProperties);
 		});
 		
 
@@ -299,21 +343,110 @@ Changelog:
 		
 		// apply the CSS transitions
 		this.each(function() {
-			var that = $(this).unbind(transitionEndEvent);
-			if (!jQuery.isEmptyObject(that.data('cssEnhanced'))) {
-				if (!jQuery.isEmptyObject(that.data('cssEnhanced').secondary)) {
-					callbackQueue++;
-					var secondary = that.data('cssEnhanced').secondary || {};
-					that.css(that.data('cssEnhanced'));
-					setTimeout(function(){ 
-						that.bind(transitionEndEvent, cssCallback).css(secondary);
-					});
-				}
+			var self = jQuery(this).unbind(transitionEndEvent);
+			if (!jQuery.isEmptyObject(self.data('cssEnhanced')) && !jQuery.isEmptyObject(self.data('cssEnhanced').secondary)) {
+				callbackQueue++;
+				var secondary = self.data('cssEnhanced').secondary || {};
+				self.css(self.data('cssEnhanced'));
+				setTimeout(function(){ 
+					self.bind(transitionEndEvent, cssCallback).css(secondary);
+				});
 			}
 		});
 	
-		
 		// over and out
 		return this;
 	};	
+	
+	
+	/**
+		@public
+		@name jQuery.fn.stop
+		@function
+		@description The enhanced jQuery.stop function (resets transforms to left/top)
+		@param {boolean} [clearQueue]
+		@param {boolean} [gotoEnd]
+		@param {boolean} [leaveTransforms] Leave transforms/translations as they are? Default: false (reset translations to calculated explicit left/top props)
+	*/
+	jQuery.fn.stop = function(clearQueue, gotoEnd, leaveTransforms) {
+		if (!cssTransitionsSupported) return originalStopMethod.apply(this, [clearQueue, gotoEnd]);
+		
+		// clear the queue?
+		if (clearQueue) {
+			this.queue([]);
+		}
+		
+		// reset CSS variable
+		var reset = {};
+		for (var i = cssPrefixes.length - 1; i >= 0; i--){
+			reset[cssPrefixes[i]+'transition-property'] = 'none';
+			reset[cssPrefixes[i]+'transition-duration'] = '';
+			reset[cssPrefixes[i]+'transition-timing-function'] = '';
+		};
+		
+		// route to appropriate stop methods
+		this.each(function() {
+			var self = jQuery(this),
+				cStyle = window.getComputedStyle(this, null),
+				restore = {};
+			
+			// is this a CSS transition?
+			if (!jQuery.isEmptyObject(self.data('cssEnhanced')) && !jQuery.isEmptyObject(self.data('cssEnhanced').secondary)) {
+				var selfCSSData = self.data('cssEnhanced');
+
+				if (gotoEnd) {
+				    // grab end state properties
+					restore = selfCSSData.secondary;
+					
+					if (!leaveTransforms && typeof selfCSSData.meta['left_o'] !== undefined || typeof selfCSSData.meta['top_o'] !== undefined) {						
+						restore['left'] = typeof selfCSSData.meta['left_o'] !== undefined ? selfCSSData.meta['left_o'] : 'auto';
+						restore['top'] = typeof selfCSSData.meta['top_o'] !== undefined ? selfCSSData.meta['top_o'] : 'auto';
+						
+						// remove the transformations
+						restore['-webkit-transform'] = '';
+						restore['-moz-transform'] = '';
+						restore['-o-transform'] = '';
+						restore['transform'] = '';
+					}
+				}
+				else {
+					// grab current properties
+					for (var prop in self.data('cssEnhanced').secondary){
+						prop = prop.replace( rupper, "-$1" ).toLowerCase();
+						restore[prop] = cStyle.getPropertyValue(prop);
+						
+						// is this a matrix property? extract left and top and apply
+						if (!leaveTransforms && (/matrix/i).test(restore[prop])) {
+							var explodedMatrix = restore[prop].replace(/^matrix\(/i, '').split(/, |\)$/g);	
+							
+							// apply the explicit left/top props						
+							restore['left'] = explodedMatrix[4]+'px' || 'auto';
+							restore['top'] = explodedMatrix[5]+'px' || 'auto';
+							
+							// remove the transformations
+							restore['-webkit-transform'] = '';
+							restore['-moz-transform'] = '';
+							restore['-o-transform'] = '';
+							restore['transform'] = '';
+						}
+				    }
+				}
+				
+				// remove transition timing functions
+				self.
+					unbind(transitionEndEvent).
+					css(reset).
+					css(restore).
+					data('translateX', 0).
+					data('translateY', 0).
+					data('cssEnhanced', null);
+			}
+			else {
+				// dom transition
+				originalStopMethod.apply(self, [clearQueue, gotoEnd]);
+			}
+		});
+		
+		return this;
+	};
 })(jQuery);
