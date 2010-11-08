@@ -227,7 +227,7 @@ Changelog:
 		@param {function} [callback]
 	*/
 	jQuery.fn.animate = function(prop, speed, easing, callback) {
-		if (typeof jQuery.ui !== undefined || !cssTransitionsSupported || jQuery.isEmptyObject(prop)) return originalAnimateMethod.apply(this, arguments);
+		if (typeof jQuery.ui !== 'undefined' || !cssTransitionsSupported || jQuery.isEmptyObject(prop)) return originalAnimateMethod.apply(this, arguments);
 
 		// get default jquery timing from shortcuts
 		speed = typeof speed === 'undefined' || speed == 'def' ? "_default" : speed;
