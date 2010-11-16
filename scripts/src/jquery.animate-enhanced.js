@@ -1,5 +1,5 @@
 /************************************************
-	jquery.animate-enhanced plugin v0.51
+	jquery.animate-enhanced plugin v0.52
 	Author: www.benbarnett.net || @benpbarnett
 *************************************************
 
@@ -22,6 +22,10 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.52 (16/11/2010):
+		- leaveTransforms: true bug fixes
+		- 'Applying' user callback function to retain 'this' context
+
 	0.51 (08/11/2010):
 		- Bailing out with jQuery UI. This is only so the plugin plays nice with others and is TEMPORARY.
 	
@@ -153,16 +157,13 @@ Changelog:
 		@param {boolean} [use3D] Use translate3d if available?
 	*/
 	var applyCSSTransition = function(e, property, duration, easing, value, isTransform, use3D) {
-		if (!e.data('cssEnhanced')) {
-			var setup = { secondary: {}, meta: { left: 0, top: 0 } };
-			e.data('cssEnhanced', setup);
-		}
-		
+		var enhanceData = e.data('cssEnhanced') || { secondary: {}, meta: { left: 0, top: 0 } };
+
 		if (property == "left" || property == "top") {
-			var meta = e.data('cssEnhanced').meta;
+			var meta = enhanceData.meta;
 			meta[property] = value;
 			meta[property+'_o'] = e.css(property) == "auto" ? 0 + value : parseInt(e.css(property).replace(/px/g, ''), 10) + value || 0;
-			e.data('cssEnhanced').meta = meta;
+			enhanceData.meta = meta;
 			
 			// fix 0 issue (transition by 0 = nothing)
 			if (isTransform && value === 0) {
@@ -170,9 +171,14 @@ Changelog:
 				meta[property] = value;
 				meta[property+'_o'] = 0;
 			}
+			
+			// add shortcuts
+			if (property == "left") e.data('translateX', value);
+			if (property == "top") e.data('translateY', value);
 		}
 		
-		return e.data('cssEnhanced', applyCSSWithPrefix(e.data('cssEnhanced'), property, duration, easing, value, isTransform, use3D));
+		// reapply data and return
+		return e.data('cssEnhanced', applyCSSWithPrefix(enhanceData, property, duration, easing, value, isTransform, use3D));
 	};
 	
 	/**
@@ -243,21 +249,25 @@ Changelog:
 			callbackQueue--;
 			if (callbackQueue <= 0) { 			
 				// we're done, trigger the user callback
-				if (typeof opt.complete === 'function') return opt.complete.call();
+				if (typeof opt.complete === 'function') return opt.complete.apply(this, arguments);
 			}
 		},
 		cssCallback = function() {
-			var reset = {};
+			var self = jQuery(this),
+				reset = {};
+				
 			for (var i = cssPrefixes.length - 1; i >= 0; i--){
 				reset[cssPrefixes[i]+'transition-property'] = 'none';
 				reset[cssPrefixes[i]+'transition-duration'] = '';
 				reset[cssPrefixes[i]+'transition-timing-function'] = '';
 			};
+			
+			// unbind
+			self.unbind(transitionEndEvent);
 		
 			// convert translations to left & top for layout
 			if (!prop.leaveTransforms === true) {
-				var self = jQuery(this),
-					props = self.data('cssEnhanced') || {},
+				var props = self.data('cssEnhanced') || {},
 					restore = {
 						'-webkit-transform': '',
 						'-moz-transform': '',
@@ -271,14 +281,13 @@ Changelog:
 				}
 				
 				self.
-					unbind(transitionEndEvent).
 					css(reset).
 					css(restore).
 					data('translateX', 0).
 					data('translateY', 0).
 					data('cssEnhanced', null);
 			}
-			
+
 			// run the main callback function
 			propertyCallback();
 		},
@@ -347,8 +356,11 @@ Changelog:
 			var self = jQuery(this).unbind(transitionEndEvent);
 			if (!jQuery.isEmptyObject(self.data('cssEnhanced')) && !jQuery.isEmptyObject(self.data('cssEnhanced').secondary)) {
 				callbackQueue++;
+				
 				var secondary = self.data('cssEnhanced').secondary || {};
 				self.css(self.data('cssEnhanced'));
+				
+				// has to be done in a timeout to ensure transition properties are set
 				setTimeout(function(){ 
 					self.bind(transitionEndEvent, cssCallback).css(secondary);
 				});
@@ -373,9 +385,7 @@ Changelog:
 		if (typeof jQuery.ui !== 'undefined' || !cssTransitionsSupported) return originalStopMethod.apply(this, [clearQueue, gotoEnd]);
 		
 		// clear the queue?
-		if (clearQueue) {
-			this.queue([]);
-		}
+		if (clearQueue) this.queue([]);
 		
 		// reset CSS variable
 		var reset = {};
