@@ -1,5 +1,5 @@
 /************************************************
-	jquery.animate-enhanced plugin v0.52
+	jquery.animate-enhanced plugin v0.53
 	Author: www.benbarnett.net || @benpbarnett
 *************************************************
 
@@ -22,6 +22,10 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.53 (17/11/2010):
+		- New $.translate() method to easily calculate current transformed translation
+		- Repeater callback bug fix for leaveTransforms:true (was constantly appending properties)
+		
 	0.52 (16/11/2010):
 		- leaveTransforms: true bug fixes
 		- 'Applying' user callback function to retain 'this' context
@@ -91,7 +95,7 @@ Changelog:
 	
 	/**
 		@private
-		@name interpretValue
+		@name _interpretValue
 		@function
 		@description Interpret value ("px", "+=" and "-=" sanitisation)
 		@param {object} [element] The Element for current CSS analysis
@@ -99,16 +103,17 @@ Changelog:
 		@param {string} [prop] The property we're looking at
 		@param {boolean} [isTransform] Is this a CSS3 transform?
 	*/
-	var interpretValue = function(e, val, prop, isTransform) {	
+	var _interpretValue = function(e, val, prop, isTransform) {	
 		var parts = rfxnum.exec(val),
 			start = e.css(prop) === "auto" ? 0 : e.css(prop),
 			cleanCSSStart = typeof start == "string" ? start.replace(/px/g, "") : start,
 			cleanTarget = typeof val == "string" ? val.replace(/px/g, "") : val,
 			cleanStart = isTransform === true ? 0 : cleanCSSStart,
-			hidden = jQuery(e).is(":hidden");
-
-		if (prop == "left" && e.data('translateX')) cleanStart = cleanCSSStart + e.data('translateX');
-		if (prop == "top" && e.data('translateY')) cleanStart = cleanCSSStart + e.data('translateY');
+			hidden = e.is(":hidden"),
+			translation = e.translation();
+			
+		if (prop == "left") cleanStart = parseInt(cleanCSSStart, 10) + translation.x;
+		if (prop == "top") cleanStart = parseInt(cleanCSSStart, 10) + translation.y;
 		
 		// deal with shortcuts
 		if (!parts && val == "show") {
@@ -120,9 +125,7 @@ Changelog:
 			var end = parseFloat(parts[2]);
 
 			// If a +=/-= token was provided, we're doing a relative animation
-			if (parts[1]) {
-				end = ((parts[1] === "-=" ? -1 : 1) * end) + parseInt(cleanStart, 10);
-			}
+			if (parts[1]) end = ((parts[1] === "-=" ? -1 : 1) * end) + parseInt(cleanStart, 10);
 			return end;
 		} else {
 			return cleanStart;
@@ -131,21 +134,21 @@ Changelog:
 	
 	/**
 		@private
-		@name getTranslation
+		@name _getTranslation
 		@function
 		@description Make a translate or translate3d string
 		@param {integer} [x] 
 		@param {integer} [y] 
 		@param {boolean} [use3D] Use translate3d if available?
 	*/
-	var getTranslation = function(x, y, use3D) {
+	var _getTranslation = function(x, y, use3D) {
 		return (use3D === true && has3D) ? "translate3d("+x+"px,"+y+"px,0)" : "translate("+x+"px,"+y+"px)";
 	};
 	
 	
 	/**
 		@private
-		@name applyCSSTransition
+		@name _applyCSSTransition
 		@function
 		@description Build up the CSS object
 		@param {object} [e] 
@@ -156,7 +159,7 @@ Changelog:
 		@param {boolean} [isTransform] Is this a CSS transformation?
 		@param {boolean} [use3D] Use translate3d if available?
 	*/
-	var applyCSSTransition = function(e, property, duration, easing, value, isTransform, use3D) {
+	var _applyCSSTransition = function(e, property, duration, easing, value, isTransform, use3D) {
 		var enhanceData = e.data('cssEnhanced') || { secondary: {}, meta: { left: 0, top: 0 } };
 
 		if (property == "left" || property == "top") {
@@ -171,19 +174,15 @@ Changelog:
 				meta[property] = value;
 				meta[property+'_o'] = 0;
 			}
-			
-			// add shortcuts
-			if (property == "left") e.data('translateX', value);
-			if (property == "top") e.data('translateY', value);
 		}
 		
 		// reapply data and return
-		return e.data('cssEnhanced', applyCSSWithPrefix(enhanceData, property, duration, easing, value, isTransform, use3D));
+		return e.data('cssEnhanced', _applyCSSWithPrefix(enhanceData, property, duration, easing, value, isTransform, use3D));
 	};
 	
 	/**
 		@private
-		@name applyCSSWithPrefix
+		@name _applyCSSWithPrefix
 		@function
 		@description Helper function to build up CSS properties using the various prefixes
 		@param {object} [cssProperties] Current CSS object to merge with
@@ -194,7 +193,7 @@ Changelog:
 		@param {boolean} [isTransform] Is this a CSS transformation?
 		@param {boolean} [use3D] Use translate3d if available?
 	*/
-	var applyCSSWithPrefix = function(cssProperties, property, duration, easing, value, isTransform, use3D) {
+	var _applyCSSWithPrefix = function(cssProperties, property, duration, easing, value, isTransform, use3D) {
 		cssProperties = typeof cssProperties === 'undefined' ? {} : cssProperties;
 		cssProperties.secondary = typeof cssProperties.secondary === 'undefined' ? {} : cssProperties.secondary;
 		
@@ -203,7 +202,7 @@ Changelog:
 			cssProperties[cssPrefixes[i]+'transition-property'] += ', ' + ((isTransform === true) ? cssPrefixes[i] + 'transform' : property);
 			cssProperties[cssPrefixes[i]+'transition-duration'] = duration + 'ms';
 			cssProperties[cssPrefixes[i]+'transition-timing-function'] = easing;
-			cssProperties.secondary[((isTransform === true) ? cssPrefixes[i]+'transform' : property)] = (isTransform === true) ? getTranslation(cssProperties.meta.left, cssProperties.meta.top, use3D) : value;
+			cssProperties.secondary[((isTransform === true) ? cssPrefixes[i]+'transform' : property)] = (isTransform === true) ? _getTranslation(cssProperties.meta.left, cssProperties.meta.top, use3D) : value;
 		};
 		
 		return cssProperties;
@@ -211,14 +210,50 @@ Changelog:
 	
 	/**
 		@private
-		@name isBoxShortcut
+		@name _isBoxShortcut
 		@function
 		@description Shortcut to detect if we need to step away from slideToggle, CSS accelerated transitions (to come later with fx.step support)
 		@param {variant} [value]
 		@param {string} [property]
 	*/
-	var isBoxShortcut = function(value, property) {
+	var _isBoxShortcut = function(value, property) {
 		return (property == "width" || property == "height") && (value == "show" || value == "hide" || value == "toggle");
+	};
+	
+	
+	/**
+		@public
+		@name translation
+		@function
+		@description Get current X and Y translations
+		@param {object} [element]
+	*/
+	jQuery.fn.translation = function() {
+		if (!this[0]) {
+			return null;
+		}
+
+		var	elem = this[0],
+			cStyle = window.getComputedStyle(elem, null),
+			translation = {
+				x: 0,
+				y: 0
+			};
+			
+		for (var i = cssPrefixes.length - 1; i >= 0; i--){
+			var transform = cStyle.getPropertyValue(cssPrefixes[i] + "transform");
+			if (transform && (/matrix/i).test(transform)) {
+				var explodedMatrix = transform.replace(/^matrix\(/i, '').split(/, |\)$/g);
+				translation = {
+					x: explodedMatrix[4],
+					y: explodedMatrix[5]
+				};
+				
+				break;
+			}
+		}
+		
+		return translation;
 	};
 	
 	
@@ -282,11 +317,11 @@ Changelog:
 				
 				self.
 					css(reset).
-					css(restore).
-					data('translateX', 0).
-					data('translateY', 0).
-					data('cssEnhanced', null);
+					css(restore);
 			}
+			
+			// reset
+			self.data('cssEnhanced', null);
 
 			// run the main callback function
 			propertyCallback();
@@ -297,24 +332,21 @@ Changelog:
 			swing: 'ease-in-out',
 			easeInOutQuint: 'cubic-bezier(0.5, 0, 0, 0.8)'
 		},
-		domProperties = null, cssEasing = "";
-		
-		// make easing css friendly
-		cssEasing = opt.easing || "swing";
-		cssEasing = easings[cssEasing] ? easings[cssEasing] : cssEasing;
+		domProperties = null, 
+		cssEasing = easings[opt.easing || "swing"] ? easings[opt.easing || "swing"] : opt.easing || "swing";
 
 		// seperate out the properties for the relevant animation functions
-		for (p in prop) {
+		for (var p in prop) {
 			if (jQuery.inArray(p, pluginOptions) === -1) {
 				this.each(function() {
 					var self = jQuery(this),
-						cleanVal = interpretValue(self, prop[p], p, (((p == "left" || p == "top") && prop.avoidTransforms !== true) ? true : false));
+						cleanVal = _interpretValue(self, prop[p], p, (((p == "left" || p == "top") && prop.avoidTransforms !== true) ? true : false));
 						
 					if (jQuery.inArray(p, cssTransitionProperties) > -1 && 
 						self.css(p).replace(/px/g, "") !== cleanVal &&
-						!isBoxShortcut(prop[p], p)
+						!_isBoxShortcut(prop[p], p)
 						) {						
-						applyCSSTransition(
+						_applyCSSTransition(
 							self,
 							p, 
 							opt.duration, 
@@ -351,18 +383,18 @@ Changelog:
 		}
 		
 		
-		// apply the CSS transitions
+		// apply the CSS transitions//
 		this.each(function() {
 			var self = jQuery(this).unbind(transitionEndEvent);
+			
 			if (!jQuery.isEmptyObject(self.data('cssEnhanced')) && !jQuery.isEmptyObject(self.data('cssEnhanced').secondary)) {
 				callbackQueue++;
-				
-				var secondary = self.data('cssEnhanced').secondary || {};
+
 				self.css(self.data('cssEnhanced'));
 				
 				// has to be done in a timeout to ensure transition properties are set
 				setTimeout(function(){ 
-					self.bind(transitionEndEvent, cssCallback).css(secondary);
+					self.bind(transitionEndEvent, cssCallback).css(self.data('cssEnhanced').secondary);
 				});
 			}
 		});
@@ -448,8 +480,6 @@ Changelog:
 					unbind(transitionEndEvent).
 					css(reset).
 					css(restore).
-					data('translateX', 0).
-					data('translateY', 0).
 					data('cssEnhanced', null);
 			}
 			else {
