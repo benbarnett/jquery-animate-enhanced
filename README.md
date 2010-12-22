@@ -48,6 +48,10 @@ By default if the plugin is animating a left or a top property, the translate (2
 
 Changelog
 -----------------
+0.55 (22/12/2010):
+
+* isEmptyObject function for <jQuery 1.4 (plugin still requires 1.3.2)
+
 0.54a (22/12/2010):
 
 * License changed to MIT (http://www.opensource.org/licenses/mit-license.php)
