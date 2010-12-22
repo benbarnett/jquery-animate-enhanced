@@ -26,7 +26,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ---
 Extends jQuery.animate() to automatically use CSS3 transformations where applicable.
-Requires jQuery 1.4.2+
+Requires jQuery 1.3.2+
 
 Supports -moz-transition, -webkit-transition, -o-transition, transition
 	
