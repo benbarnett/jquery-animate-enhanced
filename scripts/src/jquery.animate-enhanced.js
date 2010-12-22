@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.54
+jquery.animate-enhanced plugin v0.55
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.55 (22/12/2010):
+		- isEmptyObject function for <jQuery 1.4 (requires 1.3.2)
+
 	0.54a (22/12/2010):
 		- License changed to MIT (http://www.opensource.org/licenses/mit-license.php)
 
@@ -249,6 +252,19 @@ Changelog:
 	
 	
 	/**
+		@private
+		@name _isEmptyObject
+		@function
+		@description Check if object is empty (<1.4 compatibility)
+		@param {object} [obj]
+	*/
+	function _isEmptyObject(obj) {
+		for (var i in obj) return false;
+		return true;
+	};
+	
+	
+	/**
 		@public
 		@name translation
 		@function
@@ -294,7 +310,7 @@ Changelog:
 		@param {function} [callback]
 	*/
 	jQuery.fn.animate = function(prop, speed, easing, callback) {
-		if (!cssTransitionsSupported || jQuery.isEmptyObject(prop)) return originalAnimateMethod.apply(this, arguments);
+		if (!cssTransitionsSupported || _isEmptyObject(prop)) return originalAnimateMethod.apply(this, arguments);
 
 		// get default jquery timing from shortcuts
 		speed = typeof speed === 'undefined' || speed == 'def' ? "_default" : speed;
@@ -411,7 +427,7 @@ Changelog:
 		this.each(function() {
 			var self = jQuery(this).unbind(transitionEndEvent);
 			
-			if (!jQuery.isEmptyObject(self.data('cssEnhanced')) && !jQuery.isEmptyObject(self.data('cssEnhanced').secondary)) {
+			if (!_isEmptyObject(self.data('cssEnhanced')) && !_isEmptyObject(self.data('cssEnhanced').secondary)) {
 				callbackQueue++;
 
 				self.css(self.data('cssEnhanced'));
@@ -458,7 +474,7 @@ Changelog:
 				restore = {};
 			
 			// is this a CSS transition?
-			if (!jQuery.isEmptyObject(self.data('cssEnhanced')) && !jQuery.isEmptyObject(self.data('cssEnhanced').secondary)) {
+			if (!_isEmptyObject(self.data('cssEnhanced')) && !_isEmptyObject(self.data('cssEnhanced').secondary)) {
 				var selfCSSData = self.data('cssEnhanced');
 
 				if (gotoEnd) {
