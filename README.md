@@ -14,21 +14,7 @@ Properties supported: (more to come)
 
 Note that any properties not mentioned above will simply be handled by the standard jQuery $.animate() method. This plugin adds new functionality without taking any away.
 
-
-OCTOBER 2010 - Changelog
------------------
-* Support to enhance 'width' and 'height' properties
-* Use shortcuts, no duration for jQuery default or "fast" and "slow"
-* Compatible with .fadeIn(), .fadeOut(), .slideUp(), .slideDown(), .slideToggle()
-* Checks for 3d support before applying
-* Iterate over multiple elements and store transforms in $.data per element
-* Include support for relative values (+= / -=)
-* Better unit sanitization (string, integer, 'px') etc
-* Several Performance tweaks
-* Bug fix: for optional callback function (was required)
-* Applies data[translateX] and data[translateY] to elements for easy access
-* Added 'easeInOutQuint' easing function for CSS transitions (requires jQuery UI for JS anims)
-* Less need for leaveTransforms = true due to better position detections
+The idea is to simply enhance existing animations with a lightweight 'drop-in' plugin. Those looking for features such as IE transformations & translate() functionality should consider http://plugins.jquery.com/project/2d-transform
 
 
 Demo
@@ -58,6 +44,60 @@ By default the plugin will convert left and top animations to the CSS3 style -we
 By default the plugin will use 2d translations due to wider browser support. Set this to true to use translate3d instead. Recommended for iPhone/iPad development (here's why).
 * leaveTransforms: (Boolean)
 By default if the plugin is animating a left or a top property, the translate (2d or 3d depending on setting above) CSS3 transformation will be used. To preserve other layout dependencies, once the transition is complete, these transitions are removed and converted back to the real left and top values. Set this to true to skip this functionality.
+
+
+Changelog
+-----------------
+0.54 (22/12/2010):
+* Removed silly check for 'jQuery UI' bailouts. Sorry.
+* Scoping issues fixed - Issue #4: $(this) should give you a reference to the selector being animated.. per jquery's core animation funciton.
+
+0.53 (17/11/2010):
+* New $.translate() method to easily calculate current transformed translation
+* Repeater callback bug fix for leaveTransforms:true (was constantly appending properties)
+	
+0.52 (16/11/2010):
+* leaveTransforms: true bug fixes
+* 'Applying' user callback function to retain 'this' context
+
+0.51 (08/11/2010):
+* Bailing out with jQuery UI. This is only so the plugin plays nice with others and is TEMPORARY.
+
+0.50 (08/11/2010):
+* Support for $.fn.stop()
+* Fewer jQuery.fn entries to preserve namespace
+* All references $ converted to jQuery
+* jsDoc Toolkit style commenting for docs (coming soon)
+
+0.49 (19/10/2010):
+* Handling of 'undefined' errors for secondary CSS objects
+* Support to enhance 'width' and 'height' properties (except shortcuts involving jQuery.fx.step, e.g slideToggle)
+* Bugfix: Positioning when using avoidTransforms: true (thanks Ralf Santbergen reports)
+* Bugfix: Callbacks and Scope issues
+
+0.48 (13/10/2010):
+* Checks for 3d support before applying
+
+0.47 (12/10/2010);
+* Compatible with .fadeIn(), .fadeOut()
+* Use shortcuts, no duration for jQuery default or "fast" and "slow"
+* Clean up callback event listeners on complete (preventing multiple callbacks)
+
+0.46 (07/10/2010);
+* Compatible with .slideUp(), .slideDown(), .slideToggle()
+
+0.45 (06/10/2010):
+* 'Zero' position bug fix (was originally translating by 0 zero pixels, i.e. no movement)
+
+0.4 (05/10/2010):
+* Iterate over multiple elements and store transforms in jQuery.data per element
+* Include support for relative values (+= / -=)
+* Better unit sanitization
+* Performance tweaks
+* Fix for optional callback function (was required)
+* Applies data[translateX] and data[translateY] to elements for easy access
+* Added 'easeInOutQuint' easing function for CSS transitions (requires jQuery UI for JS anims)
+* Less need for leaveTransforms = true due to better position detections
 
 Credits
 -----------------
