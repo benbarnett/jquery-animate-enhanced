@@ -1,5 +1,5 @@
 /************************************************
-	jquery.animate-enhanced plugin v0.53
+	jquery.animate-enhanced plugin v0.54
 	Author: www.benbarnett.net || @benpbarnett
 *************************************************
 
@@ -22,6 +22,10 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.54 (22/12/2010):
+		- Removed silly check for 'jQuery UI' bailouts. Sorry.
+		- Scoping issues fixed - Issue #4: $(this) should give you a reference to the selector being animated.. per jquery's core animation funciton.
+
 	0.53 (17/11/2010):
 		- New $.translate() method to easily calculate current transformed translation
 		- Repeater callback bug fix for leaveTransforms:true (was constantly appending properties)
@@ -103,7 +107,7 @@ Changelog:
 		@param {string} [prop] The property we're looking at
 		@param {boolean} [isTransform] Is this a CSS3 transform?
 	*/
-	var _interpretValue = function(e, val, prop, isTransform) {	
+	function _interpretValue(e, val, prop, isTransform) {	
 		var parts = rfxnum.exec(val),
 			start = e.css(prop) === "auto" ? 0 : e.css(prop),
 			cleanCSSStart = typeof start == "string" ? start.replace(/px/g, "") : start,
@@ -141,7 +145,7 @@ Changelog:
 		@param {integer} [y] 
 		@param {boolean} [use3D] Use translate3d if available?
 	*/
-	var _getTranslation = function(x, y, use3D) {
+	function _getTranslation(x, y, use3D) {
 		return (use3D === true && has3D) ? "translate3d("+x+"px,"+y+"px,0)" : "translate("+x+"px,"+y+"px)";
 	};
 	
@@ -151,15 +155,15 @@ Changelog:
 		@name _applyCSSTransition
 		@function
 		@description Build up the CSS object
-		@param {object} [e] 
-		@param {string} [property]
-		@param {integer} [duration]
-		@param {string} [easing]
-		@param {variant} [value]
+		@param {object} [e] Element
+		@param {string} [property] Property we're dealing with
+		@param {integer} [duration] Duration
+		@param {string} [easing] Easing function
+		@param {variant} [value] String/integer for target value
 		@param {boolean} [isTransform] Is this a CSS transformation?
 		@param {boolean} [use3D] Use translate3d if available?
 	*/
-	var _applyCSSTransition = function(e, property, duration, easing, value, isTransform, use3D) {
+	function _applyCSSTransition(e, property, duration, easing, value, isTransform, use3D) {
 		var enhanceData = e.data('cssEnhanced') || { secondary: {}, meta: { left: 0, top: 0 } };
 
 		if (property == "left" || property == "top") {
@@ -193,7 +197,7 @@ Changelog:
 		@param {boolean} [isTransform] Is this a CSS transformation?
 		@param {boolean} [use3D] Use translate3d if available?
 	*/
-	var _applyCSSWithPrefix = function(cssProperties, property, duration, easing, value, isTransform, use3D) {
+	function _applyCSSWithPrefix(cssProperties, property, duration, easing, value, isTransform, use3D) {
 		cssProperties = typeof cssProperties === 'undefined' ? {} : cssProperties;
 		cssProperties.secondary = typeof cssProperties.secondary === 'undefined' ? {} : cssProperties.secondary;
 		
@@ -216,7 +220,7 @@ Changelog:
 		@param {variant} [value]
 		@param {string} [property]
 	*/
-	var _isBoxShortcut = function(value, property) {
+	function _isBoxShortcut(value, property) {
 		return (property == "width" || property == "height") && (value == "show" || value == "hide" || value == "toggle");
 	};
 	
@@ -226,7 +230,6 @@ Changelog:
 		@name translation
 		@function
 		@description Get current X and Y translations
-		@param {object} [element]
 	*/
 	jQuery.fn.translation = function() {
 		if (!this[0]) {
@@ -268,7 +271,7 @@ Changelog:
 		@param {function} [callback]
 	*/
 	jQuery.fn.animate = function(prop, speed, easing, callback) {
-		if (typeof jQuery.ui !== 'undefined' || !cssTransitionsSupported || jQuery.isEmptyObject(prop)) return originalAnimateMethod.apply(this, arguments);
+		if (!cssTransitionsSupported || jQuery.isEmptyObject(prop)) return originalAnimateMethod.apply(this, arguments);
 
 		// get default jquery timing from shortcuts
 		speed = typeof speed === 'undefined' || speed == 'def' ? "_default" : speed;
@@ -278,13 +281,14 @@ Changelog:
 			complete: callback || !callback && easing || jQuery.isFunction( speed ) && speed,
 			duration: speed,
 			easing: callback && easing || easing && !jQuery.isFunction(easing) && easing
-		}, 	
+		},
+		elem = this[0] || window,
 		callbackQueue = 0,
 		propertyCallback = function() {	
 			callbackQueue--;
 			if (callbackQueue <= 0) { 			
 				// we're done, trigger the user callback
-				if (typeof opt.complete === 'function') return opt.complete.apply(this, arguments);
+				if (typeof opt.complete === 'function') return opt.complete.apply(elem, arguments);
 			}
 		},
 		cssCallback = function() {
@@ -341,11 +345,8 @@ Changelog:
 				this.each(function() {
 					var self = jQuery(this),
 						cleanVal = _interpretValue(self, prop[p], p, (((p == "left" || p == "top") && prop.avoidTransforms !== true) ? true : false));
-						
-					if (jQuery.inArray(p, cssTransitionProperties) > -1 && 
-						self.css(p).replace(/px/g, "") !== cleanVal &&
-						!_isBoxShortcut(prop[p], p)
-						) {						
+												
+					if (jQuery.inArray(p, cssTransitionProperties) > -1 && self.css(p).replace(/px/g, "") !== cleanVal && !_isBoxShortcut(prop[p], p)) {						
 						_applyCSSTransition(
 							self,
 							p, 
@@ -383,7 +384,7 @@ Changelog:
 		}
 		
 		
-		// apply the CSS transitions//
+		// apply the CSS transitions
 		this.each(function() {
 			var self = jQuery(this).unbind(transitionEndEvent);
 			
@@ -393,7 +394,7 @@ Changelog:
 				self.css(self.data('cssEnhanced'));
 				
 				// has to be done in a timeout to ensure transition properties are set
-				setTimeout(function(){ 
+				setTimeout(function() { 
 					self.bind(transitionEndEvent, cssCallback).css(self.data('cssEnhanced').secondary);
 				});
 			}
@@ -414,7 +415,7 @@ Changelog:
 		@param {boolean} [leaveTransforms] Leave transforms/translations as they are? Default: false (reset translations to calculated explicit left/top props)
 	*/
 	jQuery.fn.stop = function(clearQueue, gotoEnd, leaveTransforms) {
-		if (typeof jQuery.ui !== 'undefined' || !cssTransitionsSupported) return originalStopMethod.apply(this, [clearQueue, gotoEnd]);
+		if (!cssTransitionsSupported) return originalStopMethod.apply(this, [clearQueue, gotoEnd]);
 		
 		// clear the queue?
 		if (clearQueue) this.queue([]);
