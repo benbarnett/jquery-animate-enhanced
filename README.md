@@ -3,6 +3,8 @@ jquery.animate-enhanced plugin
 
 Extend $.animate() to detect CSS transitions for Webkit, Mozilla and Opera and convert animations automatically. Compatible with IE6+
 
+Tested with jQuery 1.3.2+
+
 Properties supported: (more to come)
 -----------------
 
@@ -48,6 +50,12 @@ By default if the plugin is animating a left or a top property, the translate (2
 
 Changelog
 -----------------
+0.66 (06/01/2010):
+* Animate function rewrite in accordance with new queue system
+* BUGFIX #8: Left/top position values always assumed relative rather than absolute
+* BUGFIX #9: animation as last item in a chain — the chain is ignored?
+* BUGFIX: width/height CSS3 transformation with left/top working
+
 0.55 (22/12/2010):
 
 * isEmptyObject function for <jQuery 1.4 (plugin still requires 1.3.2)
