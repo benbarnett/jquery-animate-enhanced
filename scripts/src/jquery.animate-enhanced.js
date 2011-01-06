@@ -1,11 +1,11 @@
 /*
-jquery.animate-enhanced plugin v0.55
+jquery.animate-enhanced plugin v0.60
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
 @benpbarnett
 ---
-Copyright (c) 2010 Ben Barnett
+Copyright (c) 2011 Ben Barnett
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ---
 Extends jQuery.animate() to automatically use CSS3 transformations where applicable.
-Requires jQuery 1.3.2+
+Tested with jQuery 1.3.2+
 
 Supports -moz-transition, -webkit-transition, -o-transition, transition
 	
@@ -44,6 +44,12 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.60 (06/01/2010):
+		- Animate function rewrite in accordance with new queue system
+		- BUGFIX #8: Left/top position values always assumed relative rather than absolute
+		- BUGFIX #9: animation as last item in a chain — the chain is ignored?
+		- BUGFIX: width/height CSS3 transformation with left/top working
+		
 	0.55 (22/12/2010):
 		- isEmptyObject function for <jQuery 1.4 (requires 1.3.2)
 
@@ -110,7 +116,14 @@ Changelog:
 		cssPrefixes = ["", "-webkit-", "-moz-", "-o-"],
 		pluginOptions = ["avoidTransforms", "useTranslate3d", "leaveTransforms"],
 		rfxnum = /^([+-]=)?([\d+-.]+)(.*)$/,
-		rupper = /([A-Z])/g;
+		rupper = /([A-Z])/g,
+		defaultEnhanceData = { 
+			secondary: {}, 
+			meta: { 
+				left: 0, 
+				top: 0 
+			} 
+		};
 		
 	
 	// ----------
@@ -136,8 +149,8 @@ Changelog:
 	function _interpretValue(e, val, prop, isTransform) {	
 		var parts = rfxnum.exec(val),
 			start = e.css(prop) === "auto" ? 0 : e.css(prop),
-			cleanCSSStart = typeof start == "string" ? start.replace(/px/g, "") : start,
-			cleanTarget = typeof val == "string" ? val.replace(/px/g, "") : val,
+			cleanCSSStart = typeof start == "string" ? _cleanValue(start) : start,
+			cleanTarget = typeof val == "string" ? _cleanValue(val) : val,
 			cleanStart = isTransform === true ? 0 : cleanCSSStart,
 			hidden = e.is(":hidden"),
 			translation = e.translation();
@@ -190,24 +203,29 @@ Changelog:
 		@param {boolean} [use3D] Use translate3d if available?
 	*/
 	function _applyCSSTransition(e, property, duration, easing, value, isTransform, use3D) {
-		var enhanceData = e.data('cssEnhanced') || { secondary: {}, meta: { left: 0, top: 0 } };
+		var enhanceData = e.data('cssEnhanced') || jQuery.extend(true, {}, defaultEnhanceData),
+			offsetPosition = value;
 
 		if (property == "left" || property == "top") {
-			var meta = enhanceData.meta;
-			meta[property] = value;
-			meta[property+'_o'] = e.css(property) == "auto" ? 0 + value : parseInt(e.css(property).replace(/px/g, ''), 10) + value || 0;
+			var meta = enhanceData.meta,
+				cleanPropertyValue = _cleanValue(e.css(property)) || 0;
+			
+			offsetPosition = isTransform ? value - cleanPropertyValue : value;
+				
+			meta[property] = offsetPosition;
+			meta[property+'_o'] = e.css(property) == "auto" ? 0 + offsetPosition : cleanPropertyValue + offsetPosition || 0;
 			enhanceData.meta = meta;
 			
 			// fix 0 issue (transition by 0 = nothing)
-			if (isTransform && value === 0) {
-				value = 0 - meta[property+'_o'];
-				meta[property] = value;
+			if (isTransform && offsetPosition === 0) {
+				offsetPosition = 0 - meta[property+'_o'];
+				meta[property] = offsetPosition;
 				meta[property+'_o'] = 0;
 			}
 		}
 		
 		// reapply data and return
-		return e.data('cssEnhanced', _applyCSSWithPrefix(enhanceData, property, duration, easing, value, isTransform, use3D));
+		return e.data('cssEnhanced', _applyCSSWithPrefix(enhanceData, property, duration, easing, offsetPosition, isTransform, use3D));
 	};
 	
 	/**
@@ -265,6 +283,18 @@ Changelog:
 	
 	
 	/**
+		@private
+		@name _cleanValue
+		@function
+		@description Remove 'px' and other artifacts
+		@param {variant} [val]
+	*/
+	function _cleanValue(val) {
+		return Math.abs(val.replace(/px/i, ''));
+	};
+	
+	
+	/**
 		@public
 		@name translation
 		@function
@@ -310,137 +340,120 @@ Changelog:
 		@param {function} [callback]
 	*/
 	jQuery.fn.animate = function(prop, speed, easing, callback) {
+		var optall = jQuery.speed(speed, easing, callback);
+		
 		if (!cssTransitionsSupported || _isEmptyObject(prop)) return originalAnimateMethod.apply(this, arguments);
-
-		// get default jquery timing from shortcuts
-		speed = typeof speed === 'undefined' || speed == 'def' ? "_default" : speed;
-		if (typeof jQuery.fx.speeds[speed] !== 'undefined') speed = jQuery.fx.speeds[speed];
 		
-		var opt = speed && typeof speed === "object" ? speed : {
-			complete: callback || !callback && easing || jQuery.isFunction( speed ) && speed,
-			duration: speed,
-			easing: callback && easing || easing && !jQuery.isFunction(easing) && easing
-		},
-		elem = this[0] || window,
-		callbackQueue = 0,
-		propertyCallback = function() {	
-			callbackQueue--;
-			if (callbackQueue <= 0) { 			
-				// we're done, trigger the user callback
-				if (typeof opt.complete === 'function') return opt.complete.apply(elem, arguments);
-			}
-		},
-		cssCallback = function() {
+		return this[ optall.queue === false ? "each" : "queue" ](function() {			
 			var self = jQuery(this),
-				reset = {};
+				opt = jQuery.extend({}, optall),
+				elem = this || window,
+				callbackQueue = 0,
+				propertyCallback = function() {	
+					callbackQueue--;
+					if (callbackQueue == 0) { 			
+						// we're done, trigger the user callback
+						self.queue([]);
+						if (typeof opt.complete === 'function') return opt.complete.apply(elem, arguments);
+					}
+				},
+				cssCallback = function() {
+					var reset = {};
 				
-			for (var i = cssPrefixes.length - 1; i >= 0; i--){
-				reset[cssPrefixes[i]+'transition-property'] = 'none';
-				reset[cssPrefixes[i]+'transition-duration'] = '';
-				reset[cssPrefixes[i]+'transition-timing-function'] = '';
-			};
-			
-			// unbind
-			self.unbind(transitionEndEvent);
-		
-			// convert translations to left & top for layout
-			if (!prop.leaveTransforms === true) {
-				var props = self.data('cssEnhanced') || {},
-					restore = {
-						'-webkit-transform': '',
-						'-moz-transform': '',
-						'-o-transform': '',
-						'transform': ''
+					for (var i = cssPrefixes.length - 1; i >= 0; i--){
+						reset[cssPrefixes[i]+'transition-property'] = 'none';
+						reset[cssPrefixes[i]+'transition-duration'] = '';
+						reset[cssPrefixes[i]+'transition-timing-function'] = '';
 					};
-
-				if (typeof props.meta !== 'undefined') {
-					restore['left'] = props.meta.left_o + 'px';
-					restore['top'] = props.meta.top_o + 'px';
-				}
-				
-				self.
-					css(reset).
-					css(restore);
-			}
 			
-			// reset
-			self.data('cssEnhanced', null);
+					// unbind
+					self.unbind(transitionEndEvent);
+		
+					// convert translations to left & top for layout
+					if (!prop.leaveTransforms === true) {
+						var props = self.data('cssEnhanced') || {},
+							restore = {};
+							
+						for (i = cssPrefixes.length - 1; i >= 0; i--){
+							restore[cssPrefixes[i]+'transform'] = '';
+						}
 
-			// run the main callback function
-			propertyCallback();
-		},
-		easings = {
-			bounce: 'cubic-bezier(0.0, 0.35, .5, 1.3)', 
-			linear: 'linear',
-			swing: 'ease-in-out',
-			easeInOutQuint: 'cubic-bezier(0.5, 0, 0, 0.8)'
-		},
-		domProperties = null, 
-		cssEasing = easings[opt.easing || "swing"] ? easings[opt.easing || "swing"] : opt.easing || "swing";
+						if (typeof props.meta !== 'undefined') {
+							restore['left'] = props.meta.left_o + 'px';
+							restore['top'] = props.meta.top_o + 'px';
+						}
+				
+						self.css(reset).css(restore);
+					}
+			
+					// reset
+					self.data('cssEnhanced', null);
 
-		// seperate out the properties for the relevant animation functions
-		for (var p in prop) {
-			if (jQuery.inArray(p, pluginOptions) === -1) {
-				this.each(function() {
-					var self = jQuery(this),
-						cleanVal = _interpretValue(self, prop[p], p, (((p == "left" || p == "top") && prop.avoidTransforms !== true) ? true : false));
-												
-					if (jQuery.inArray(p, cssTransitionProperties) > -1 && self.css(p).replace(/px/g, "") !== cleanVal && !_isBoxShortcut(prop[p], p)) {						
+					// run the main callback function
+					propertyCallback();
+				},
+				easings = {
+					bounce: 'cubic-bezier(0.0, 0.35, .5, 1.3)', 
+					linear: 'linear',
+					swing: 'ease-in-out',
+					easeInOutQuint: 'cubic-bezier(0.5, 0, 0, 0.8)'
+				},
+				domProperties = null, 
+				cssEasing = easings[opt.easing || "swing"] ? easings[opt.easing || "swing"] : opt.easing || "swing";
+
+			// seperate out the properties for the relevant animation functions
+			for (var p in prop) {
+				if (jQuery.inArray(p, pluginOptions) === -1) {
+					var cleanVal = _interpretValue(self, prop[p], p, (((p == "left" || p == "top") && prop.avoidTransforms !== true) ? true : false));
+						
+					if (jQuery.inArray(p, cssTransitionProperties) > -1 && _cleanValue(self.css(p)) !== cleanVal && !_isBoxShortcut(prop[p], p)) {						
 						_applyCSSTransition(
 							self,
 							p, 
 							opt.duration, 
 							cssEasing, 
 							((p == "left" || p == "top") && prop.avoidTransforms === true) ? cleanVal + "px" : cleanVal, 
-							(((p == "left" || p == "top") && prop.avoidTransforms !== true) ? true : false), 
+							((p == "left" || p == "top") && prop.avoidTransforms !== true) ? true : false, 
 							(prop.useTranslate3d === true) ? true : false);
 					}
 					else {
 						domProperties = (!domProperties) ? {} : domProperties;
 						domProperties[p] = prop[p];
 					}
-				});
+				}
 			}
-		}
 		
-		// clean up
-		this.each(function() {
-			var self = jQuery(this),
-				cssProperties = self.data('cssEnhanced') || {};
-				
+			// clean up
+			var cssProperties = self.data('cssEnhanced') || {};
 			for (var i = cssPrefixes.length - 1; i >= 0; i--){
 				if (typeof cssProperties[cssPrefixes[i]+'transition-property'] !== 'undefined') cssProperties[cssPrefixes[i]+'transition-property'] = cssProperties[cssPrefixes[i]+'transition-property'].substr(2);
 			}
-			
+		
 			self.data('cssEnhanced', cssProperties);
-		});
 		
-
-		// fire up DOM based animations
-		if (domProperties) {
-			callbackQueue++;
-			originalAnimateMethod.apply(this, [domProperties, opt.duration, opt.easing, propertyCallback]);
-		}
+			// fire up DOM based animations
+			if (domProperties) {
+				callbackQueue++;
+				originalAnimateMethod.apply(this, [domProperties, opt.duration, opt.easing, propertyCallback]);
+			}
 		
-		
-		// apply the CSS transitions
-		this.each(function() {
-			var self = jQuery(this).unbind(transitionEndEvent);
+			// apply the CSS transitions
+			self.unbind(transitionEndEvent);
 			
 			if (!_isEmptyObject(self.data('cssEnhanced')) && !_isEmptyObject(self.data('cssEnhanced').secondary)) {
 				callbackQueue++;
 
 				self.css(self.data('cssEnhanced'));
-				
+			
 				// has to be done in a timeout to ensure transition properties are set
 				setTimeout(function() { 
 					self.bind(transitionEndEvent, cssCallback).css(self.data('cssEnhanced').secondary);
 				});
 			}
+
+			// over and out
+			return this;
 		});
-	
-		// over and out
-		return this;
 	};	
 	
 	
@@ -471,7 +484,8 @@ Changelog:
 		this.each(function() {
 			var self = jQuery(this),
 				cStyle = window.getComputedStyle(this, null),
-				restore = {};
+				restore = {},
+				i;
 			
 			// is this a CSS transition?
 			if (!_isEmptyObject(self.data('cssEnhanced')) && !_isEmptyObject(self.data('cssEnhanced').secondary)) {
@@ -486,10 +500,9 @@ Changelog:
 						restore['top'] = typeof selfCSSData.meta['top_o'] !== undefined ? selfCSSData.meta['top_o'] : 'auto';
 						
 						// remove the transformations
-						restore['-webkit-transform'] = '';
-						restore['-moz-transform'] = '';
-						restore['-o-transform'] = '';
-						restore['transform'] = '';
+						for (i = cssPrefixes.length - 1; i >= 0; i--){
+							restore[cssPrefixes[i]+'transform'] = '';
+						}
 					}
 				}
 				else {
@@ -507,10 +520,9 @@ Changelog:
 							restore['top'] = explodedMatrix[5]+'px' || 'auto';
 							
 							// remove the transformations
-							restore['-webkit-transform'] = '';
-							restore['-moz-transform'] = '';
-							restore['-o-transform'] = '';
-							restore['transform'] = '';
+							for (i = cssPrefixes.length - 1; i >= 0; i--){
+								restore[cssPrefixes[i]+'transform'] = '';
+							}
 						}
 				    }
 				}
