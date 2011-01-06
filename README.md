@@ -51,6 +51,7 @@ By default if the plugin is animating a left or a top property, the translate (2
 Changelog
 -----------------
 0.66 (06/01/2010):
+
 * Animate function rewrite in accordance with new queue system
 * BUGFIX #8: Left/top position values always assumed relative rather than absolute
 * BUGFIX #9: animation as last item in a chain — the chain is ignored?
