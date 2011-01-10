@@ -350,7 +350,6 @@ Changelog:
 			callbackQueue = 0;
 		
 		if (!cssTransitionsSupported || _isEmptyObject(prop)) {
-			console.log('hi');
 			return originalAnimateMethod.apply(this, arguments);
 		} 
 		
