@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.61
+jquery.animate-enhanced plugin v0.62
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.62 (10/01/2010):
+		- BUGFIX #11: queue is not a function issue fixed
+		
 	0.61 (10/01/2010):
 		- BUGFIX #10: Negative positions converting to positive
 	
@@ -343,20 +346,22 @@ Changelog:
 		@param {function} [callback]
 	*/
 	jQuery.fn.animate = function(prop, speed, easing, callback) {
-		var optall = jQuery.speed(speed, easing, callback);
+		var optall = jQuery.speed(speed, easing, callback),
+			callbackQueue = 0;
 		
-		if (!cssTransitionsSupported || _isEmptyObject(prop)) return originalAnimateMethod.apply(this, arguments);
+		if (!cssTransitionsSupported || _isEmptyObject(prop)) {
+			console.log('hi');
+			return originalAnimateMethod.apply(this, arguments);
+		} 
 		
-		return this[ optall.queue === false ? "each" : "queue" ](function() {			
+		return this[ optall.queue === false ? "each" : "queue" ](function() {
 			var self = jQuery(this),
 				opt = jQuery.extend({}, optall),
 				elem = this || window,
-				callbackQueue = 0,
 				propertyCallback = function() {	
 					callbackQueue--;
-					if (callbackQueue == 0) { 			
-						// we're done, trigger the user callback
-						self.queue([]);
+					if (callbackQueue == 0) {
+						// we're done, trigger the user callback					
 						if (typeof opt.complete === 'function') return opt.complete.apply(elem, arguments);
 					}
 				},
@@ -431,14 +436,19 @@ Changelog:
 			for (var i = cssPrefixes.length - 1; i >= 0; i--){
 				if (typeof cssProperties[cssPrefixes[i]+'transition-property'] !== 'undefined') cssProperties[cssPrefixes[i]+'transition-property'] = cssProperties[cssPrefixes[i]+'transition-property'].substr(2);
 			}
-		
-			self.data('cssEnhanced', cssProperties);
-		
+			
 			// fire up DOM based animations
 			if (domProperties) {
 				callbackQueue++;
-				originalAnimateMethod.apply(this, [domProperties, opt.duration, opt.easing, propertyCallback]);
+				originalAnimateMethod.apply(self, [domProperties, {
+					duration: opt.duration, 
+					easing: opt.easing, 
+					complete: propertyCallback,
+					queue: opt.queue
+				}]);
 			}
+		
+			self.data('cssEnhanced', cssProperties);
 		
 			// apply the CSS transitions
 			self.unbind(transitionEndEvent);
@@ -454,8 +464,8 @@ Changelog:
 				});
 			}
 
-			// over and out
-			return this;
+			// strict JS compliance
+			return true;
 		});
 	};	
 	
