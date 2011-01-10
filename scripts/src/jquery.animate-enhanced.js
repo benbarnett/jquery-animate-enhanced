@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.60
+jquery.animate-enhanced plugin v0.61
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.61 (10/01/2010):
+		- BUGFIX #10: Negative positions converting to positive
+	
 	0.60 (06/01/2010):
 		- Animate function rewrite in accordance with new queue system
 		- BUGFIX #8: Left/top position values always assumed relative rather than absolute
@@ -290,7 +293,7 @@ Changelog:
 		@param {variant} [val]
 	*/
 	function _cleanValue(val) {
-		return Math.abs(val.replace(/px/i, ''));
+		return parseFloat(val.replace(/px/i, ''));
 	};
 	
 	
