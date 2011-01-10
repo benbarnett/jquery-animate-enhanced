@@ -50,7 +50,11 @@ By default if the plugin is animating a left or a top property, the translate (2
 
 Changelog
 -----------------
-0.66 (06/01/2010):
+0.61 (10/01/2010):
+
+* BUGFIX #10: Negative positions converting to positive
+
+0.60 (06/01/2010):
 
 * Animate function rewrite in accordance with new queue system
 * BUGFIX #8: Left/top position values always assumed relative rather than absolute
