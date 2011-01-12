@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.62
+jquery.animate-enhanced plugin v0.63
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.63 (12/01/2010):
+		- BUGFIX #11: callbacks not firing when new value == old value
+		
 	0.62 (10/01/2010):
 		- BUGFIX #11: queue is not a function issue fixed
 		
@@ -412,8 +415,7 @@ Changelog:
 			for (var p in prop) {
 				if (jQuery.inArray(p, pluginOptions) === -1) {
 					var cleanVal = _interpretValue(self, prop[p], p, (((p == "left" || p == "top") && prop.avoidTransforms !== true) ? true : false));
-						
-					if (jQuery.inArray(p, cssTransitionProperties) > -1 && _cleanValue(self.css(p)) !== cleanVal && !_isBoxShortcut(prop[p], p)) {						
+					if (jQuery.inArray(p, cssTransitionProperties) > -1 /**&& _cleanValue(self.css(p)) !== cleanVal**/ && !_isBoxShortcut(prop[p], p)) {
 						_applyCSSTransition(
 							self,
 							p, 
@@ -435,17 +437,6 @@ Changelog:
 			for (var i = cssPrefixes.length - 1; i >= 0; i--){
 				if (typeof cssProperties[cssPrefixes[i]+'transition-property'] !== 'undefined') cssProperties[cssPrefixes[i]+'transition-property'] = cssProperties[cssPrefixes[i]+'transition-property'].substr(2);
 			}
-			
-			// fire up DOM based animations
-			if (domProperties) {
-				callbackQueue++;
-				originalAnimateMethod.apply(self, [domProperties, {
-					duration: opt.duration, 
-					easing: opt.easing, 
-					complete: propertyCallback,
-					queue: opt.queue
-				}]);
-			}
 		
 			self.data('cssEnhanced', cssProperties);
 		
@@ -461,6 +452,17 @@ Changelog:
 				setTimeout(function() { 
 					self.bind(transitionEndEvent, cssCallback).css(self.data('cssEnhanced').secondary);
 				});
+			}
+
+			// fire up DOM based animations
+			if (!_isEmptyObject(domProperties)) {
+				callbackQueue++;
+				originalAnimateMethod.apply(self, [domProperties, {
+					duration: opt.duration, 
+					easing: opt.easing, 
+					complete: propertyCallback,
+					queue: opt.queue
+				}]);
 			}
 
 			// strict JS compliance
