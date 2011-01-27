@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.63
+jquery.animate-enhanced plugin v0.64
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.64 (27/01/2010):
+		- BUGFIX #13: .slideUp(), .slideToggle(), .slideDown() bugfixes in Webkit
+		
 	0.63 (12/01/2010):
 		- BUGFIX #11: callbacks not firing when new value == old value
 		
@@ -270,11 +273,15 @@ Changelog:
 		@name _isBoxShortcut
 		@function
 		@description Shortcut to detect if we need to step away from slideToggle, CSS accelerated transitions (to come later with fx.step support)
-		@param {variant} [value]
-		@param {string} [property]
+		@param {object} [prop]
 	*/
-	function _isBoxShortcut(value, property) {
-		return (property == "width" || property == "height") && (value == "show" || value == "hide" || value == "toggle");
+	function _isBoxShortcut(prop) {
+		for (var property in prop) {
+			if ((property == "width" || property == "height") && (prop[property] == "show" || prop[property] == "hide" || prop[property] == "toggle")) {
+				return true;
+			}
+		}
+		return false;
 	};
 	
 	
@@ -352,7 +359,7 @@ Changelog:
 		var optall = jQuery.speed(speed, easing, callback),
 			callbackQueue = 0;
 		
-		if (!cssTransitionsSupported || _isEmptyObject(prop)) {
+		if (!cssTransitionsSupported || _isEmptyObject(prop) || _isBoxShortcut(prop)) {
 			return originalAnimateMethod.apply(this, arguments);
 		} 
 		
@@ -410,12 +417,14 @@ Changelog:
 				},
 				domProperties = null, 
 				cssEasing = easings[opt.easing || "swing"] ? easings[opt.easing || "swing"] : opt.easing || "swing";
+				
 
 			// seperate out the properties for the relevant animation functions
 			for (var p in prop) {
 				if (jQuery.inArray(p, pluginOptions) === -1) {
 					var cleanVal = _interpretValue(self, prop[p], p, (((p == "left" || p == "top") && prop.avoidTransforms !== true) ? true : false));
-					if (jQuery.inArray(p, cssTransitionProperties) > -1 /**&& _cleanValue(self.css(p)) !== cleanVal**/ && !_isBoxShortcut(prop[p], p)) {
+					
+					if (jQuery.inArray(p, cssTransitionProperties) > -1) {
 						_applyCSSTransition(
 							self,
 							p, 
@@ -457,6 +466,7 @@ Changelog:
 			// fire up DOM based animations
 			if (!_isEmptyObject(domProperties)) {
 				callbackQueue++;
+
 				originalAnimateMethod.apply(self, [domProperties, {
 					duration: opt.duration, 
 					easing: opt.easing, 
