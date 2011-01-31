@@ -50,6 +50,14 @@ By default if the plugin is animating a left or a top property, the translate (2
 
 Changelog
 -----------------
+0.64 (27/01/2010):
+
+* BUGFIX #13: .slideUp(), .slideToggle(), .slideDown() bugfixes in Webkit
+        
+0.63 (12/01/2010):
+
+* BUGFIX #11: callbacks not firing when new value == old value
+
 0.62 (10/01/2010):
 
 * BUGFIX #11: queue is not a function issue fixed
