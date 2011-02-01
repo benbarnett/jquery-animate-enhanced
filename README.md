@@ -50,23 +50,28 @@ By default if the plugin is animating a left or a top property, the translate (2
 
 Changelog
 -----------------
-0.64 (27/01/2010):
+
+0.65 (01/02/2011):
+
+* Callbacks with queue() support refactored to support element arrays
+
+0.64 (27/01/2011):
 
 * BUGFIX #13: .slideUp(), .slideToggle(), .slideDown() bugfixes in Webkit
         
-0.63 (12/01/2010):
+0.63 (12/01/2011):
 
 * BUGFIX #11: callbacks not firing when new value == old value
 
-0.62 (10/01/2010):
+0.62 (10/01/2011):
 
 * BUGFIX #11: queue is not a function issue fixed
 
-0.61 (10/01/2010):
+0.61 (10/01/2011):
 
 * BUGFIX #10: Negative positions converting to positive
 
-0.60 (06/01/2010):
+0.60 (06/01/2011):
 
 * Animate function rewrite in accordance with new queue system
 * BUGFIX #8: Left/top position values always assumed relative rather than absolute

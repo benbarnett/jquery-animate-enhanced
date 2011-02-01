@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.64
+jquery.animate-enhanced plugin v0.65
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,19 +44,22 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
-	0.64 (27/01/2010):
+	0.65 (01/02/2011):
+		- Callbacks with queue() support refactored to support element arrays
+		
+	0.64 (27/01/2011):
 		- BUGFIX #13: .slideUp(), .slideToggle(), .slideDown() bugfixes in Webkit
 		
-	0.63 (12/01/2010):
+	0.63 (12/01/2011):
 		- BUGFIX #11: callbacks not firing when new value == old value
 		
-	0.62 (10/01/2010):
+	0.62 (10/01/2011):
 		- BUGFIX #11: queue is not a function issue fixed
 		
-	0.61 (10/01/2010):
+	0.61 (10/01/2011):
 		- BUGFIX #10: Negative positions converting to positive
 	
-	0.60 (06/01/2010):
+	0.60 (06/01/2011):
 		- Animate function rewrite in accordance with new queue system
 		- BUGFIX #8: Left/top position values always assumed relative rather than absolute
 		- BUGFIX #9: animation as last item in a chain — the chain is ignored?
@@ -357,23 +360,25 @@ Changelog:
 	*/
 	jQuery.fn.animate = function(prop, speed, easing, callback) {
 		var optall = jQuery.speed(speed, easing, callback),
-			callbackQueue = 0;
+			elements = this,
+			callbackQueue = 0,
+			propertyCallback = function() {		
+				callbackQueue--;
+				if (callbackQueue === 0) {
+					// we're done, trigger the user callback					
+					if (typeof optall.complete === 'function') { 
+						optall.complete.apply(elements, arguments); 
+					}
+				}
+			};
 		
 		if (!cssTransitionsSupported || _isEmptyObject(prop) || _isBoxShortcut(prop)) {
 			return originalAnimateMethod.apply(this, arguments);
 		} 
-		
+
 		return this[ optall.queue === false ? "each" : "queue" ](function() {
 			var self = jQuery(this),
 				opt = jQuery.extend({}, optall),
-				elem = this || window,
-				propertyCallback = function() {	
-					callbackQueue--;
-					if (callbackQueue == 0) {
-						// we're done, trigger the user callback					
-						if (typeof opt.complete === 'function') return opt.complete.apply(elem, arguments);
-					}
-				},
 				cssCallback = function() {
 					var reset = {};
 				
@@ -382,7 +387,7 @@ Changelog:
 						reset[cssPrefixes[i]+'transition-duration'] = '';
 						reset[cssPrefixes[i]+'transition-timing-function'] = '';
 					};
-			
+				
 					// unbind
 					self.unbind(transitionEndEvent);
 		
@@ -407,7 +412,7 @@ Changelog:
 					self.data('cssEnhanced', null);
 
 					// run the main callback function
-					propertyCallback();
+					propertyCallback.call(self);
 				},
 				easings = {
 					bounce: 'cubic-bezier(0.0, 0.35, .5, 1.3)', 
@@ -415,7 +420,7 @@ Changelog:
 					swing: 'ease-in-out',
 					easeInOutQuint: 'cubic-bezier(0.5, 0, 0, 0.8)'
 				},
-				domProperties = null, 
+				domProperties = {}, 
 				cssEasing = easings[opt.easing || "swing"] ? easings[opt.easing || "swing"] : opt.easing || "swing";
 				
 
@@ -435,7 +440,6 @@ Changelog:
 							(prop.useTranslate3d === true) ? true : false);
 					}
 					else {
-						domProperties = (!domProperties) ? {} : domProperties;
 						domProperties[p] = prop[p];
 					}
 				}
@@ -444,13 +448,12 @@ Changelog:
 			// clean up
 			var cssProperties = self.data('cssEnhanced') || {};
 			for (var i = cssPrefixes.length - 1; i >= 0; i--){
-				if (typeof cssProperties[cssPrefixes[i]+'transition-property'] !== 'undefined') cssProperties[cssPrefixes[i]+'transition-property'] = cssProperties[cssPrefixes[i]+'transition-property'].substr(2);
+				if (typeof cssProperties[cssPrefixes[i]+'transition-property'] !== 'undefined') {
+					cssProperties[cssPrefixes[i]+'transition-property'] = cssProperties[cssPrefixes[i]+'transition-property'].substr(2);
+				}
 			}
 		
-			self.data('cssEnhanced', cssProperties);
-		
-			// apply the CSS transitions
-			self.unbind(transitionEndEvent);
+			self.data('cssEnhanced', cssProperties).unbind(transitionEndEvent);
 			
 			if (!_isEmptyObject(self.data('cssEnhanced')) && !_isEmptyObject(self.data('cssEnhanced').secondary)) {
 				callbackQueue++;
