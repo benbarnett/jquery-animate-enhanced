@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.66
+jquery.animate-enhanced plugin v0.67
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.67 (15/02/2011):
+		- Code cleanups & file size improvements for compression.
+
 	0.66 (15/02/2011):
 		- Zero second fadeOut(), fadeIn() fixes
 
@@ -138,10 +141,12 @@ Changelog:
 		defaultEnhanceData = { 
 			secondary: {}, 
 			meta: { 
-				left: 0, 
-				top: 0 
-			} 
-		};
+				left: 0,
+				top: 0
+			}
+		},
+		
+		DATA_KEY = 'jQe';
 		
 	
 	// ----------
@@ -221,7 +226,7 @@ Changelog:
 		@param {boolean} [use3D] Use translate3d if available?
 	*/
 	function _applyCSSTransition(e, property, duration, easing, value, isTransform, use3D) {
-		var enhanceData = e.data('cssEnhanced') || jQuery.extend(true, {}, defaultEnhanceData),
+		var enhanceData = e.data(DATA_KEY) || jQuery.extend(true, {}, defaultEnhanceData),
 			offsetPosition = value;
 
 		if (property == "left" || property == "top") {
@@ -243,7 +248,7 @@ Changelog:
 		}
 		
 		// reapply data and return
-		return e.data('cssEnhanced', _applyCSSWithPrefix(enhanceData, property, duration, easing, offsetPosition, isTransform, use3D));
+		return e.data(DATA_KEY, _applyCSSWithPrefix(enhanceData, property, duration, easing, offsetPosition, isTransform, use3D));
 	};
 	
 	/**
@@ -396,7 +401,7 @@ Changelog:
 		
 					// convert translations to left & top for layout
 					if (!prop.leaveTransforms === true) {
-						var props = self.data('cssEnhanced') || {},
+						var props = self.data(DATA_KEY) || {},
 							restore = {};
 							
 						for (i = cssPrefixes.length - 1; i >= 0; i--){
@@ -412,7 +417,7 @@ Changelog:
 					}
 			
 					// reset
-					self.data('cssEnhanced', null);
+					self.data(DATA_KEY, null);
 
 					// run the main callback function
 					propertyCallback.call(self);
@@ -449,23 +454,23 @@ Changelog:
 			}
 		
 			// clean up
-			var cssProperties = self.data('cssEnhanced') || {};
+			var cssProperties = self.data(DATA_KEY) || {};
 			for (var i = cssPrefixes.length - 1; i >= 0; i--){
 				if (typeof cssProperties[cssPrefixes[i]+'transition-property'] !== 'undefined') {
 					cssProperties[cssPrefixes[i]+'transition-property'] = cssProperties[cssPrefixes[i]+'transition-property'].substr(2);
 				}
 			}
 		
-			self.data('cssEnhanced', cssProperties).unbind(transitionEndEvent);
+			self.data(DATA_KEY, cssProperties).unbind(transitionEndEvent);
 			
-			if (!_isEmptyObject(self.data('cssEnhanced')) && !_isEmptyObject(self.data('cssEnhanced').secondary)) {
+			if (!_isEmptyObject(self.data(DATA_KEY)) && !_isEmptyObject(self.data(DATA_KEY).secondary)) {
 				callbackQueue++;
 
-				self.css(self.data('cssEnhanced'));
+				self.css(self.data(DATA_KEY));
 			
 				// has to be done in a timeout to ensure transition properties are set
 				setTimeout(function() { 
-					self.bind(transitionEndEvent, cssCallback).css(self.data('cssEnhanced').secondary);
+					self.bind(transitionEndEvent, cssCallback).css(self.data(DATA_KEY).secondary);
 				});
 			}
 
@@ -518,8 +523,8 @@ Changelog:
 				i;
 			
 			// is this a CSS transition?
-			if (!_isEmptyObject(self.data('cssEnhanced')) && !_isEmptyObject(self.data('cssEnhanced').secondary)) {
-				var selfCSSData = self.data('cssEnhanced');
+			if (!_isEmptyObject(self.data(DATA_KEY)) && !_isEmptyObject(self.data(DATA_KEY).secondary)) {
+				var selfCSSData = self.data(DATA_KEY);
 
 				if (gotoEnd) {
 				    // grab end state properties
@@ -537,7 +542,7 @@ Changelog:
 				}
 				else {
 					// grab current properties
-					for (var prop in self.data('cssEnhanced').secondary){
+					for (var prop in self.data(DATA_KEY).secondary){
 						prop = prop.replace( rupper, "-$1" ).toLowerCase();
 						restore[prop] = cStyle.getPropertyValue(prop);
 						
@@ -562,7 +567,7 @@ Changelog:
 					unbind(transitionEndEvent).
 					css(reset).
 					css(restore).
-					data('cssEnhanced', null);
+					data(DATA_KEY, null);
 			}
 			else {
 				// dom transition

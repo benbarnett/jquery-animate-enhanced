@@ -51,6 +51,10 @@ By default if the plugin is animating a left or a top property, the translate (2
 Changelog
 -----------------
 
+0.67 (15/02/2011):
+
+* Code cleanups & file size improvements for compression.
+
 0.66 (15/02/2011):
 
 * Zero second fadeOut(), fadeIn() fixes
