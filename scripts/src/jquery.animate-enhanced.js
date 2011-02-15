@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.67
+jquery.animate-enhanced plugin v0.68
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.68 (15/02/2011):
+		- width/height fixes & queue issues resolved.
+
 	0.67 (15/02/2011):
 		- Code cleanups & file size improvements for compression.
 
@@ -322,6 +325,21 @@ Changelog:
 	
 	
 	/**
+		@private
+		@name _appropriateProperty
+		@function
+		@description Function to check if property should be handled by plugin
+		@param {string} [prop]
+		@param {variant} [value]
+	*/
+	function _appropriateProperty(prop, value, element) {
+		var is = jQuery.inArray(prop, cssTransitionProperties) > -1;
+		if ((prop == 'width' || prop == 'height') && (value === parseFloat(element.css(prop)))) is = false;
+		return is;
+	};
+	
+	
+	/**
 		@public
 		@name translation
 		@function
@@ -354,6 +372,7 @@ Changelog:
 		
 		return translation;
 	};
+
 	
 	
 	/**
@@ -370,7 +389,7 @@ Changelog:
 		var optall = jQuery.speed(speed, easing, callback),
 			elements = this,
 			callbackQueue = 0,
-			propertyCallback = function() {		
+			propertyCallback = function() {
 				callbackQueue--;
 				if (callbackQueue === 0) {
 					// we're done, trigger the user callback					
@@ -436,8 +455,8 @@ Changelog:
 			for (var p in prop) {
 				if (jQuery.inArray(p, pluginOptions) === -1) {
 					var cleanVal = _interpretValue(self, prop[p], p, (((p == "left" || p == "top") && prop.avoidTransforms !== true) ? true : false));
-					
-					if (jQuery.inArray(p, cssTransitionProperties) > -1) {
+	
+					if (_appropriateProperty(p, cleanVal, self)) {
 						_applyCSSTransition(
 							self,
 							p, 
@@ -472,6 +491,10 @@ Changelog:
 				setTimeout(function() { 
 					self.bind(transitionEndEvent, cssCallback).css(self.data(DATA_KEY).secondary);
 				});
+			}
+			else {
+				// it won't get fired otherwise
+				opt.queue = false;
 			}
 
 			// fire up DOM based animations

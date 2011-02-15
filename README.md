@@ -51,6 +51,10 @@ By default if the plugin is animating a left or a top property, the translate (2
 Changelog
 -----------------
 
+0.68 (15/02/2011):
+
+* Width/height fixes & queue issues resolved.
+
 0.67 (15/02/2011):
 
 * Code cleanups & file size improvements for compression.
