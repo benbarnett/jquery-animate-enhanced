@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"> 
+<html lang="en"> 
+<head> 
+	<title>Absolute Animation</title> 
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+	
+	<style type="text/css"> 
+		* {margin:0;padding:0;}
+		html, body {
+			background:#000;
+			overflow:hidden;
+		}
+		.fly	{ 
+			position:absolute; 
+			top:50%; 
+			left:50%;
+			width:0;
+			height:0;
+		}
+	</style> 
+	
+	<script src="../scripts/contrib/jquery-1.5.0.js" type="text/javascript"></script> 
+	<script src="../scripts/src/jquery.animate-enhanced.js" type="text/javascript"></script> 
+	<script type="text/javascript"> 
+	
+		$(function() {
+			
+			s = 64;								// maximum flare size
+			w = $(window);
+			m = Math;
+			
+			fly = function(e) {
+				
+				t = m.random()*(w.height()-s);	// top position
+				l = m.random()*(w.width()-s);	// left position
+				o = m.random().toFixed(2);		// opacity value
+				d = m.random()*(s-1)+1;			// flare size		
+				n = m.random()*2000+500;		// duration
+				
+//				n = 100;
+ 
+				$(e)
+					.animate(
+						{
+							left: l,
+							top:  t,
+							width : d,
+							height: d,
+							opacity: o
+						},
+						n,
+						function() { fly(e) }
+					);
+			};
+			
+			for (var i=0; i < 50; i++) {
+				$('body').append('<img class="fly" src="http://www.planetoftunes.com/dtp/png_test/red_circle.png">');
+			};
+		
+			$('.fly').each(function() {
+				n = m.random()*(s-1)+1
+				$(this).css({
+					'left': w.width()/2,
+					'top': w.height()/2,
+					'width': n,
+					'height': n
+				})
+				fly($(this));
+			})
+		});
+	
+	</script> 
+</head> 
+<body> 
+ 
+	
+</body> 
+</html>

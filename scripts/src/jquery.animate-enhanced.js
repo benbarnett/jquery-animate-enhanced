@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.65
+jquery.animate-enhanced plugin v0.66
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.66 (15/02/2011):
+		- Zero second fadeOut(), fadeIn() fixes
+
 	0.65 (01/02/2011):
 		- Callbacks with queue() support refactored to support element arrays
 		
@@ -372,7 +375,7 @@ Changelog:
 				}
 			};
 		
-		if (!cssTransitionsSupported || _isEmptyObject(prop) || _isBoxShortcut(prop)) {
+		if (!cssTransitionsSupported || _isEmptyObject(prop) || _isBoxShortcut(prop) || optall.duration <= 0) {
 			return originalAnimateMethod.apply(this, arguments);
 		} 
 

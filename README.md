@@ -51,6 +51,10 @@ By default if the plugin is animating a left or a top property, the translate (2
 Changelog
 -----------------
 
+0.66 (15/02/2011):
+
+* Zero second fadeOut(), fadeIn() fixes
+
 0.65 (01/02/2011):
 
 * Callbacks with queue() support refactored to support element arrays
