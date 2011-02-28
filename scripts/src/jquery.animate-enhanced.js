@@ -229,7 +229,7 @@ Changelog:
 		@param {boolean} [use3D] Use translate3d if available?
 	*/
 	function _applyCSSTransition(e, property, duration, easing, value, isTransform, use3D) {
-		var enhanceData = e.data(DATA_KEY) || jQuery.extend(true, {}, defaultEnhanceData),
+		var enhanceData = e.data(DATA_KEY) || $.extend(true, {}, defaultEnhanceData),
 			offsetPosition = value;
 
 		if (property == "left" || property == "top") {
@@ -333,7 +333,7 @@ Changelog:
 		@param {variant} [value]
 	*/
 	function _appropriateProperty(prop, value, element) {
-		var is = jQuery.inArray(prop, cssTransitionProperties) > -1;
+		var is = $.inArray(prop, cssTransitionProperties) > -1;
 		if ((prop == 'width' || prop == 'height') && (value === parseFloat(element.css(prop)))) is = false;
 		return is;
 	};
@@ -345,7 +345,7 @@ Changelog:
 		@function
 		@description Get current X and Y translations
 	*/
-	jQuery.fn.translation = function() {
+	$.fn.translation = function() {
 		if (!this[0]) {
 			return null;
 		}
@@ -385,8 +385,8 @@ Changelog:
 		@param {string} [easing]
 		@param {function} [callback]
 	*/
-	jQuery.fn.animate = function(prop, speed, easing, callback) {
-		var optall = jQuery.speed(speed, easing, callback),
+	$.fn.animate = function(prop, speed, easing, callback) {
+		var optall = $.speed(speed, easing, callback),
 			elements = this,
 			callbackQueue = 0,
 			propertyCallback = function() {
@@ -404,8 +404,8 @@ Changelog:
 		} 
 
 		return this[ optall.queue === false ? "each" : "queue" ](function() {
-			var self = jQuery(this),
-				opt = jQuery.extend({}, optall),
+			var self = $(this),
+				opt = $.extend({}, optall),
 				cssCallback = function() {
 					var reset = {};
 				
@@ -453,7 +453,7 @@ Changelog:
 
 			// seperate out the properties for the relevant animation functions
 			for (var p in prop) {
-				if (jQuery.inArray(p, pluginOptions) === -1) {
+				if ($.inArray(p, pluginOptions) === -1) {
 					var cleanVal = _interpretValue(self, prop[p], p, (((p == "left" || p == "top") && prop.avoidTransforms !== true) ? true : false));
 	
 					if (_appropriateProperty(p, cleanVal, self)) {
@@ -524,7 +524,7 @@ Changelog:
 		@param {boolean} [gotoEnd]
 		@param {boolean} [leaveTransforms] Leave transforms/translations as they are? Default: false (reset translations to calculated explicit left/top props)
 	*/
-	jQuery.fn.stop = function(clearQueue, gotoEnd, leaveTransforms) {
+	$.fn.stop = function(clearQueue, gotoEnd, leaveTransforms) {
 		if (!cssTransitionsSupported) return originalStopMethod.apply(this, [clearQueue, gotoEnd]);
 		
 		// clear the queue?
@@ -540,7 +540,7 @@ Changelog:
 		
 		// route to appropriate stop methods
 		this.each(function() {
-			var self = jQuery(this),
+			var self = $(this),
 				cStyle = window.getComputedStyle(this, null),
 				restore = {},
 				i;
