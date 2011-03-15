@@ -136,16 +136,19 @@ Changelog:
 	// ----------
 	// Plugin variables
 	// ----------
-	var	cssTransitionProperties = ["top", "left", "opacity", "height", "width"],
+	var	cssTransitionProperties = ["top", "right", "bottom", "left", "opacity", "height", "width"],
+		directions = ["top", "right", "bottom", "left"],
 		cssPrefixes = ["", "-webkit-", "-moz-", "-o-"],
 		pluginOptions = ["avoidTransforms", "useTranslate3d", "leaveTransforms"],
 		rfxnum = /^([+-]=)?([\d+-.]+)(.*)$/,
 		rupper = /([A-Z])/g,
 		defaultEnhanceData = { 
 			secondary: {}, 
-			meta: { 
-				left: 0,
-				top: 0
+			meta: {
+				top : 0,
+				right : 0,
+				bottom : 0,
+				left : 0
 			}
 		},
 		
@@ -180,9 +183,12 @@ Changelog:
 			cleanStart = isTransform === true ? 0 : cleanCSSStart,
 			hidden = e.is(":hidden"),
 			translation = e.translation();
-			
-		if (prop == "left") cleanStart = parseInt(cleanCSSStart, 10) + translation.x;
-		if (prop == "top") cleanStart = parseInt(cleanCSSStart, 10) + translation.y;
+		
+		for (var dir in directions) {
+			if (prop == dir) {
+				cleanStart = parseInt(cleanCSSStart, 10) + translation[directions[dir]];
+			}
+		}
 		
 		// deal with shortcuts
 		if (!parts && val == "show") {
@@ -226,24 +232,26 @@ Changelog:
 		@param {string} [easing] Easing function
 		@param {variant} [value] String/integer for target value
 		@param {boolean} [isTransform] Is this a CSS transformation?
+		@param {boolean} [isTranslatable] Is this a CSS translation?
 		@param {boolean} [use3D] Use translate3d if available?
 	*/
-	function _applyCSSTransition(e, property, duration, easing, value, isTransform, use3D) {
+	function _applyCSSTransition(e, property, duration, easing, value, isTransform, isTranslatable, use3D) {
 		var enhanceData = e.data(DATA_KEY) || jQuery.extend(true, {}, defaultEnhanceData),
-			offsetPosition = value;
-
-		if (property == "left" || property == "top") {
+			offsetPosition = value,
+			isDirection = jQuery.inArray(property, directions) > -1;
+			
+		if (isDirection) {
 			var meta = enhanceData.meta,
 				cleanPropertyValue = _cleanValue(e.css(property)) || 0;
 			
-			offsetPosition = isTransform ? value - cleanPropertyValue : value;
-				
+			offsetPosition = isDirection ? value - cleanPropertyValue : value;
+			
 			meta[property] = offsetPosition;
 			meta[property+'_o'] = e.css(property) == "auto" ? 0 + offsetPosition : cleanPropertyValue + offsetPosition || 0;
 			enhanceData.meta = meta;
 			
 			// fix 0 issue (transition by 0 = nothing)
-			if (isTransform && offsetPosition === 0) {
+			if (isTranslatable && offsetPosition === 0) {
 				offsetPosition = 0 - meta[property+'_o'];
 				meta[property] = offsetPosition;
 				meta[property+'_o'] = 0;
@@ -251,7 +259,7 @@ Changelog:
 		}
 		
 		// reapply data and return
-		return e.data(DATA_KEY, _applyCSSWithPrefix(enhanceData, property, duration, easing, offsetPosition, isTransform, use3D));
+		return e.data(DATA_KEY, _applyCSSWithPrefix(enhanceData, property, duration, easing, offsetPosition, isTransform, isTranslatable, use3D));
 	};
 	
 	/**
@@ -265,18 +273,19 @@ Changelog:
 		@param {string} [easing]
 		@param {variant} [value]
 		@param {boolean} [isTransform] Is this a CSS transformation?
+		@param {boolean} [isTranslatable] Is this a CSS translation?
 		@param {boolean} [use3D] Use translate3d if available?
 	*/
-	function _applyCSSWithPrefix(cssProperties, property, duration, easing, value, isTransform, use3D) {
+	function _applyCSSWithPrefix(cssProperties, property, duration, easing, value, isTransform, isTranslatable, use3D) {
 		cssProperties = typeof cssProperties === 'undefined' ? {} : cssProperties;
 		cssProperties.secondary = typeof cssProperties.secondary === 'undefined' ? {} : cssProperties.secondary;
 		
 		for (var i = cssPrefixes.length - 1; i >= 0; i--){			
 			if (typeof cssProperties[cssPrefixes[i] + 'transition-property'] === 'undefined') cssProperties[cssPrefixes[i] + 'transition-property'] = '';
-			cssProperties[cssPrefixes[i]+'transition-property'] += ', ' + ((isTransform === true) ? cssPrefixes[i] + 'transform' : property);
+			cssProperties[cssPrefixes[i]+'transition-property'] += ', ' + ((isTransform === true && isTranslatable === true) ? cssPrefixes[i] + 'transform' : property);
 			cssProperties[cssPrefixes[i]+'transition-duration'] = duration + 'ms';
 			cssProperties[cssPrefixes[i]+'transition-timing-function'] = easing;
-			cssProperties.secondary[((isTransform === true) ? cssPrefixes[i]+'transform' : property)] = (isTransform === true) ? _getTranslation(cssProperties.meta.left, cssProperties.meta.top, use3D) : value;
+			cssProperties.secondary[((isTransform === true && isTranslatable === true) ? cssPrefixes[i]+'transform' : property)] = (isTransform === true && isTranslatable === true) ? _getTranslation(cssProperties.meta.left, cssProperties.meta.top, use3D) : value;
 		};
 		
 		return cssProperties;
@@ -386,7 +395,8 @@ Changelog:
 		@param {function} [callback]
 	*/
 	jQuery.fn.animate = function(prop, speed, easing, callback) {
-		var optall = jQuery.speed(speed, easing, callback),
+		var isTranslatable = !(typeof prop["bottom"] !== "undefined" || typeof prop["right"] !== "undefined"),
+			optall = jQuery.speed(speed, easing, callback),
 			elements = this,
 			callbackQueue = 0,
 			propertyCallback = function() {
@@ -402,7 +412,7 @@ Changelog:
 		if (!cssTransitionsSupported || _isEmptyObject(prop) || _isBoxShortcut(prop) || optall.duration <= 0) {
 			return originalAnimateMethod.apply(this, arguments);
 		} 
-
+		
 		return this[ optall.queue === false ? "each" : "queue" ](function() {
 			var self = jQuery(this),
 				opt = jQuery.extend({}, optall),
@@ -427,9 +437,10 @@ Changelog:
 							restore[cssPrefixes[i]+'transform'] = '';
 						}
 
-						if (typeof props.meta !== 'undefined') {
-							restore['left'] = props.meta.left_o + 'px';
-							restore['top'] = props.meta.top_o + 'px';
+						if (isTranslatable && typeof props.meta !== 'undefined') {
+							for (var j = 0, dir; dir = directions[j]; ++j) {
+								restore[dir] = props.meta[dir+"_o"] + "px";
+							}
 						}
 				
 						self.css(reset).css(restore);
@@ -449,22 +460,24 @@ Changelog:
 				},
 				domProperties = {}, 
 				cssEasing = easings[opt.easing || "swing"] ? easings[opt.easing || "swing"] : opt.easing || "swing";
-				
-
+						
 			// seperate out the properties for the relevant animation functions
 			for (var p in prop) {
 				if (jQuery.inArray(p, pluginOptions) === -1) {
-					var cleanVal = _interpretValue(self, prop[p], p, (((p == "left" || p == "top") && prop.avoidTransforms !== true) ? true : false));
-	
+					var isDirection = jQuery.inArray(p, directions) > -1,
+						cleanVal = _interpretValue(self, prop[p], p, (isDirection && prop.avoidTransforms !== true));
+						
 					if (_appropriateProperty(p, cleanVal, self)) {
 						_applyCSSTransition(
 							self,
 							p, 
 							opt.duration, 
 							cssEasing, 
-							((p == "left" || p == "top") && prop.avoidTransforms === true) ? cleanVal + "px" : cleanVal, 
-							((p == "left" || p == "top") && prop.avoidTransforms !== true) ? true : false, 
-							(prop.useTranslate3d === true) ? true : false);
+							isDirection && prop.avoidTransforms === true ? cleanVal + "px" : cleanVal,
+							isDirection && prop.avoidTransforms !== true,
+							isTranslatable,
+							prop.useTranslate3d === true);
+						
 					}
 					else {
 						domProperties[p] = prop[p];
