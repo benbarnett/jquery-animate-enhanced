@@ -395,6 +395,7 @@ Changelog:
 		@param {function} [callback]
 	*/
 	jQuery.fn.animate = function(prop, speed, easing, callback) {
+		prop = prop || {};
 		var isTranslatable = !(typeof prop["bottom"] !== "undefined" || typeof prop["right"] !== "undefined"),
 			optall = jQuery.speed(speed, easing, callback),
 			elements = this,
