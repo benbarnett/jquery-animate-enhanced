@@ -239,19 +239,20 @@ Changelog:
 			
 		if (isDirection) {
 			var meta = enhanceData.meta,
-				cleanPropertyValue = _cleanValue(e.css(property)) || 0;
+				cleanPropertyValue = _cleanValue(e.css(property)) || 0,
+				stashedProperty = property + "_o";
 			
 			offsetPosition = isDirection ? value - cleanPropertyValue : value;
 			
 			meta[property] = offsetPosition;
-			meta[property+'_o'] = e.css(property) == "auto" ? 0 + offsetPosition : cleanPropertyValue + offsetPosition || 0;
+			meta[stashedProperty] = e.css(property) == "auto" ? 0 + offsetPosition : cleanPropertyValue + offsetPosition || 0;
 			enhanceData.meta = meta;
 			
 			// fix 0 issue (transition by 0 = nothing)
 			if (isTranslatable && offsetPosition === 0) {
-				offsetPosition = 0 - meta[property+'_o'];
+				offsetPosition = 0 - meta[stashedProperty];
 				meta[property] = offsetPosition;
-				meta[property+'_o'] = 0;
+				meta[stashedProperty] = 0;
 			}
 		}
 		
