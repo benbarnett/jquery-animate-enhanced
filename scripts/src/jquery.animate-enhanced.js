@@ -184,11 +184,8 @@ Changelog:
 			hidden = e.is(":hidden"),
 			translation = e.translation();
 		
-		for (var dir in directions) {
-			if (prop == dir) {
-				cleanStart = parseInt(cleanCSSStart, 10) + translation[directions[dir]];
-			}
-		}
+		if (prop == "left") cleanStart = parseInt(cleanCSSStart, 10) + translation.x;
+		if (prop == "top") cleanStart = parseInt(cleanCSSStart, 10) + translation.y;
 		
 		// deal with shortcuts
 		if (!parts && val == "show") {
