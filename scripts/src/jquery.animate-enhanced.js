@@ -500,9 +500,11 @@ Changelog:
 
 				self.css(self.data(DATA_KEY));
 			
+				// store in a var to avoid any timing issues, depending on animation duration
+				var secondary = self.data(DATA_KEY).secondary;
 				// has to be done in a timeout to ensure transition properties are set
 				setTimeout(function() { 
-					self.bind(transitionEndEvent, cssCallback).css(self.data(DATA_KEY).secondary);
+					self.bind(transitionEndEvent, cssCallback).css(secondary);
 				});
 			}
 			else {
