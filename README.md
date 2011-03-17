@@ -10,6 +10,8 @@ Properties supported: (more to come)
 
 * left : using translate(x, y) or translate3d(x, y, z)
 * top : using translate(x, y) or translate3d(x, y, z)
+* right
+* bottom
 * opacity
 * width
 * height
@@ -50,6 +52,10 @@ By default if the plugin is animating a left or a top property, the translate (2
 
 Changelog
 -----------------
+
+0.70 (17/03/2011):
+
+* Merged Pull Request from amlw-nyt to add bottom/right handling
 
 0.68 (15/02/2011):
 
