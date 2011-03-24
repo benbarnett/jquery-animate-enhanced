@@ -372,8 +372,8 @@ Changelog:
 			if (transform && (/matrix/i).test(transform)) {
 				var explodedMatrix = transform.replace(/^matrix\(/i, '').split(/, |\)$/g);
 				translation = {
-					x: explodedMatrix[4],
-					y: explodedMatrix[5]
+					x: parseInt(explodedMatrix[4]),
+					y: parseInt(explodedMatrix[5])
 				};
 				
 				break;
