@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.72
+jquery.animate-enhanced plugin v0.73
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.73 (05/03/2011):
+		- Merged Pull Request #26: Fixed issue with fadeOut() / "hide" shortcut
+
 	0.72 (05/03/2011):
 		- Merged Pull Request #23: Added Penner equation approximations from Matthew Lein's Ceaser, and added failsafe fallbacks
 

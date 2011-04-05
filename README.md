@@ -53,6 +53,10 @@ By default if the plugin is animating a left or a top property, the translate (2
 Changelog
 -----------------
 
+0.73 (05/03/2011):
+
+* Merged Pull Request #26: Fixed issue with fadeOut() / "hide" shortcut
+
 0.72 (05/03/2011):
 
 * Merged Pull Request #23: Added Penner equation approximations from Matthew Lein's Ceaser, and added failsafe fallbacks
