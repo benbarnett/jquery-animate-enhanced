@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.71
+jquery.animate-enhanced plugin v0.72
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.72 (05/03/2011):
+		- Merged Pull Request #23: Added Penner equation approximations from Matthew Lein's Ceaser
+
 	0.71 (05/03/2011):
 		- Merged Pull Request #24: Changes translation object to integers instead of strings to fix relative values bug with leaveTransforms = true
 	
@@ -241,7 +244,7 @@ Changelog:
 		@param {boolean} [use3D] Use translate3d if available?
 	*/
 	function _applyCSSTransition(e, property, duration, easing, value, isTransform, isTranslatable, use3D) {
-		var enhanceData = e.data(DATA_KEY) || jQuery.extend(true, {}, defaultEnhanceData),
+		var enhanceData = e.data(DATA_KEY) ? !_isEmptyObject(e.data(DATA_KEY)) ? e.data(DATA_KEY) : jQuery.extend(true, {}, defaultEnhanceData) : jQuery.extend(true, {}, defaultEnhanceData),
 			offsetPosition = value,
 			isDirection = jQuery.inArray(property, directions) > -1;
 			
@@ -377,8 +380,8 @@ Changelog:
 			if (transform && (/matrix/i).test(transform)) {
 				var explodedMatrix = transform.replace(/^matrix\(/i, '').split(/, |\)$/g);
 				translation = {
-					x: parseInt(explodedMatrix[4]),
-					y: parseInt(explodedMatrix[5])
+					x: parseInt(explodedMatrix[4], 10),
+					y: parseInt(explodedMatrix[5], 10)
 				};
 				
 				break;
@@ -496,7 +499,7 @@ Changelog:
 					var isDirection = jQuery.inArray(p, directions) > -1,
 						cleanVal = _interpretValue(self, prop[p], p, (isDirection && prop.avoidTransforms !== true));
 						
-					if (_appropriateProperty(p, cleanVal, self)) {
+					if (prop.avoidTransforms !== true && _appropriateProperty(p, cleanVal, self)) {
 						_applyCSSTransition(
 							self,
 							p, 
@@ -544,10 +547,9 @@ Changelog:
 			// fire up DOM based animations
 			if (!_isEmptyObject(domProperties)) {
 				callbackQueue++;
-
 				originalAnimateMethod.apply(self, [domProperties, {
 					duration: opt.duration, 
-					easing: opt.easing, 
+					easing: jQuery.easing[opt.easing] ? opt.easing : (jQuery.easing.swing ? "swing" : "linear"), 
 					complete: propertyCallback,
 					queue: opt.queue
 				}]);
