@@ -202,6 +202,8 @@ Changelog:
 		if (!parts && val == "show") {
 			cleanStart = 1;
 			if (hidden) e.css({'display':'block', 'opacity': 0});
+		} else if (!parts && val == "hide") {
+			cleanStart = 0;
 		}
 
 		if (parts) {
@@ -454,6 +456,11 @@ Changelog:
 						}
 				
 						self.css(reset).css(restore);
+					}
+					
+					// if we used the fadeOut shortcut make sure elements are display:none
+					if (prop.opacity === 'hide') {
+						self.css('display', 'none');
 					}
 			
 					// reset
