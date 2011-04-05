@@ -53,6 +53,10 @@ By default if the plugin is animating a left or a top property, the translate (2
 Changelog
 -----------------
 
+0.72 (05/03/2011):
+
+* Merged Pull Request #23: Added Penner equation approximations from Matthew Lein's Ceaser, and added fallbacks
+
 0.71 (05/03/2011):
 
 * Merged Pull Request #24: Changes translation object to integers instead of strings to fix relative values bug with leaveTransforms = true
