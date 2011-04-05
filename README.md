@@ -55,7 +55,7 @@ Changelog
 
 0.72 (05/03/2011):
 
-* Merged Pull Request #23: Added Penner equation approximations from Matthew Lein's Ceaser, and added fallbacks
+* Merged Pull Request #23: Added Penner equation approximations from Matthew Lein's Ceaser, and added failsafe fallbacks
 
 0.71 (05/03/2011):
 

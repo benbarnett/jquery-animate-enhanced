@@ -45,7 +45,7 @@ Usage (exactly the same as it would be normally):
 	
 Changelog:
 	0.72 (05/03/2011):
-		- Merged Pull Request #23: Added Penner equation approximations from Matthew Lein's Ceaser
+		- Merged Pull Request #23: Added Penner equation approximations from Matthew Lein's Ceaser, and added failsafe fallbacks
 
 	0.71 (05/03/2011):
 		- Merged Pull Request #24: Changes translation object to integers instead of strings to fix relative values bug with leaveTransforms = true
