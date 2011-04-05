@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.70
+jquery.animate-enhanced plugin v0.71
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.71 (05/03/2011):
+		- Merged Pull Request #24: Changes translation object to integers instead of strings to fix relative values bug with leaveTransforms = true
+	
 	0.70 (17/03/2011):
 		- Merged Pull Request from amlw-nyt to add bottom/right handling
 

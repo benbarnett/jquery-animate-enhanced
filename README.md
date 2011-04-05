@@ -53,6 +53,10 @@ By default if the plugin is animating a left or a top property, the translate (2
 Changelog
 -----------------
 
+0.71 (05/03/2011):
+
+* Merged Pull Request #24: Changes translation object to integers instead of strings to fix relative values bug with leaveTransforms = true
+
 0.70 (17/03/2011):
 
 * Merged Pull Request from amlw-nyt to add bottom/right handling
