@@ -145,6 +145,7 @@ Changelog:
 */
 
 (function($, originalAnimateMethod, originalStopMethod) {
+
 	// ----------
 	// Plugin variables
 	// ----------
@@ -424,7 +425,7 @@ Changelog:
 				}
 			};
 		
-		if (!cssTransitionsSupported || _isEmptyObject(prop) || _isBoxShortcut(prop) || optall.duration <= 0) {
+		if (!cssTransitionsSupported || _isEmptyObject(prop) || _isBoxShortcut(prop) || optall.duration <= 0 || (jQuery.fn.animate.defaults.avoidTransforms === true && prop['avoidTransforms'] !== false)) {
 			return originalAnimateMethod.apply(this, arguments);
 		} 
 		
@@ -570,6 +571,7 @@ Changelog:
 		});
 	};	
 	
+    jQuery.fn.animate.defaults = {};
 	
 	/**
 		@public
