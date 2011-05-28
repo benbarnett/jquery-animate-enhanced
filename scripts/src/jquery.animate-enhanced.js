@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.73
+jquery.animate-enhanced plugin v0.74
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.74 (28/05/2011):
+		- Fixing issue #29 to play nice with 1.6+
+
 	0.73 (05/03/2011):
 		- Merged Pull Request #26: Fixed issue with fadeOut() / "hide" shortcut
 
@@ -419,7 +422,7 @@ Changelog:
 				callbackQueue--;
 				if (callbackQueue === 0) {
 					// we're done, trigger the user callback					
-					if (typeof optall.complete === 'function') { 
+					if (typeof optall.complete === 'function') {
 						optall.complete.apply(elements, arguments); 
 					}
 				}
@@ -428,8 +431,8 @@ Changelog:
 		if (!cssTransitionsSupported || _isEmptyObject(prop) || _isBoxShortcut(prop) || optall.duration <= 0 || (jQuery.fn.animate.defaults.avoidTransforms === true && prop['avoidTransforms'] !== false)) {
 			return originalAnimateMethod.apply(this, arguments);
 		} 
-		
-		return this[ optall.queue === false ? "each" : "queue" ](function() {
+
+		return this[ optall.queue === true ? "queue" : "each" ](function() {
 			var self = jQuery(this),
 				opt = jQuery.extend({}, optall),
 				cssCallback = function() {
