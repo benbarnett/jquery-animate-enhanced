@@ -1,0 +1,240 @@
+
+<!DOCTYPE html> 
+ 
+<html lang="en"> 
+<head> 
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+	<title>jQuery Animations with automatic CSS3 transitions when possible</title> 
+	<meta name="generator" content="TextMate http://macromates.com/"> 
+	<meta name="author" content="Ben Barnett"> 
+	<!-- Date: 2010-09-01 --> 
+ 
+	
+	<style type="text/css" media="screen"> 
+		html {
+			padding:0;
+			margin:0;
+			background:#ebebeb;
+		}
+		
+		body {
+			width:760px;
+			padding:15px;
+			margin:15px auto;
+			background:#fff;
+			font: 75% "Lucida Grande", "Trebuchet MS", Verdana, sans-serif;
+			-webkit-border-radius:10px;
+			-moz-border-radius:10px;
+			border-radius:10px;
+		}
+ 
+		
+		h2.highlight {
+			padding:5px;
+			background:#ffcc00;
+		}
+		
+		.target-css, .target-dom, .target-css-leave {
+			padding:5px 20px;
+			width:280px;
+			background:#0c0;
+			margin:20px 0;
+			position:relative;
+		}
+		
+		.target-dom {
+			background:#0cc;
+		}
+		
+		.target-css-leave {
+			background:#fc0;
+		}
+		
+		p#results {
+			color:#c00;
+		}
+ 
+		div#socialise {
+			margin-top:50px;
+			padding-top:20px;
+			border-top:1px solid #ccc;
+		}
+	</style> 
+</head> 
+<body> 
+	<h1>jquery.animate-enhanced plugin</h1> 
+	<h2>Extend $.animate() to detect CSS transitions for Webkit, Mozilla and Opera and convert animations automatically. Compatible with IE6+</h2> 
+	
+	<h3>Properties supported: (more to come)</h3> 
+	<ul> 
+		<li>left : using <em>translate(x, y) or translate3d(x, y, z)</em></li> 
+		<li>top : using <em>translate(x, y) or translate3d(x, y, z)</em></li> 
+		<li>opacity</li> 
+		<li>width</li> 
+		<li>height</li> 
+	</ul> 
+	
+	<h3>New features in v0.64:</h3> 
+	<ul> 
+		<li>Animation 'queue' support (including .delay())</li> 
+		<li>Context issues fixed on callback(); 'this' = element passed in</li> 
+		<li>$.translate() method to calculate x/y transforms from CSS3 Matrix</li> 
+		<li>Support for <b>$.fn.stop([clearQueue, jumpToEnd, leaveTransforms])</b></li> 
+		<li>Tweaks for jQuery 1.4.3</li> 
+		<li>Enhance 'width' and 'height' properties</li> 
+		<li>Compatible with .fadeIn(), .fadeOut(), .slideUp(), .slideDown() and slideToggle()</li> 
+		<li>jQuery shortcuts ("fast", "slow")</li> 
+		<li>Use relative values (+= / -=) for animations</li> 
+		<li>Use strings, numbers, 'px' values and the plugin will sanitize them</li> 
+		<li>Callback function is now optional (bug from previous version)</li> 
+		<li>Apply animations to any number of elements and CSS3/DOM animations will take care of themselves</li> 
+		<li>Multiple bug fixes</li> 
+		<li>Licensed under <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a></li> 
+	</ul> 
+	
+	<p>Note that any properties not mentioned above will simply be handled by the standard jQuery $.animate() method. This plugin adds new functionality without taking any away. Requires jQuery 1.3.2+</p> 
+ 
+	<h2>Demo</h2> 
+	<p>The animation types can be used in any combination, and with any number of elements. See 3 different types below:</p> 
+	
+	<div class="target-css"> 
+		<p>Animate with CSS3 <b>(leaveTransforms:false)</b></p> 
+	</div> 
+	
+	<div class="target-css-leave"> 
+		<p>Animate with CSS3 <b>(leaveTransforms:true)</b></p> 
+	</div> 
+	
+	<div class="target-dom"> 
+		<p>Animate with DOM <b>(avoidTransforms:true)</b></p> 
+	</div> 
+	
+	<button id="start">Animate</button> 
+ 
+	<p id="results">Awaiting button click...</p> 
+	
+	<script src="https://gist.github.com/667636.js?file=jquery-animate-enhanced-demo.js"></script> 
+	
+	<h2>What it does</h2> 
+	<p>The plugin will analyse the properties you're animating on, and select the most appropriate method for the browser in use. This means your transitions on <strong>left, top and opacity</strong> will convert to a <strong>CSS3 transition</strong> on Webkit &amp; Mozilla agents that support it, and Opera 10.50+. If the user is on a browser that has no CSS3 transitions, this plugin knows about it and won't get involved. Silent degradation :)</p> 
+	
+	<p>Multiple callback mechanisms are created internally to monitor for DOM manipulation and for all '<strong>transitionend</strong>' CSS3 events to be picked up. This means you have one neat callback() for the whole animation regardless on whether the plugin is using CSS3, DOM, or both for its animations.</p> 
+	
+	<p>Progressively enhanced CSS3 animations without having to do any browser detection or special CSS, therefore using the same Javascript across your applications and websites.</p> 
+	
+	<p>As this plugin uses CSS3 translate where available, there is an internal callback mechanism to reset the 'left' and/or 'top' properties so that your layout is unaffected.</p> 
+	
+	<h2>Usage</h2> 
+	<p>Usage is identical to the <a href="http://api.jquery.com/animate/">jQuery animate() function</a>, but it comes with 3 new paramaters, which are totally optional and safe to leave untouched for general use:</p> 
+	<ul> 
+		<li> 
+			<strong>avoidTransforms</strong>: (Boolean)<br> 
+			By default the plugin will convert left and top animations to the CSS3 style -webkit-transform (or equivalent) to aid hardware acceleration. This functionality can be disabled by setting this to true.
+		</li> 
+		
+		<li> 
+			<strong>useTranslate3d</strong>: (Boolean)<br> 
+			By default the plugin will use 2d translations due to wider browser support. Set this to true to use translate3d instead. Recommended for iPhone/iPad development (<a href="http://www.benbarnett.net/2010/08/30/writing-html-and-css-for-mobile-safari-just-the-same-old-code/">here's why</a>).
+		</li> 
+		
+		<li> 
+			<strong>leaveTransforms</strong>: (Boolean)<br> 
+			By default if the plugin is animating a left or a top property, the translate (2d or 3d depending on setting above) CSS3 transformation will be used. To preserve other layout dependencies, once the transition is complete, these transitions are removed and converted back to the real left and top values. Set this to <strong>true</strong> to skip this functionality.
+		</li> 
+	</ul> 
+	
+	<h2>Download</h2> 
+	<ul> 
+		<li><a href="http://github.com/benbarnett/jQuery-Animate-Enhanced/raw/master/jquery.animate-enhanced.min.js">Compressed version</a> (5.17KB, <i>1.91KB gzipped</i>)</li> 
+		<li><a href="http://github.com/benbarnett/jQuery-Animate-Enhanced/raw/master/scripts/src/jquery.animate-enhanced.js">Uncompressed version</a> (13.94KB, <i>4.33KB gzipped</i>)</li> 
+	</ul> 
+	
+	<h2>Credits</h2> 
+	<ul> 
+		<li>Author: <a href="http://www.benbarnett.net">Ben Barnett</a> (<a href="http://twitter.com/benpbarnett">Twitter</a>)</li> 
+		<li>Aza for <a href="http://gist.github.com/435054">his gist</a> on CSS Animation wtih jQuery</li> 
+		<li>jonraasch for <a href="http://gist.github.com/373874">his gist on detecting CSS3 support</a></li> 
+	</ul> 
+	
+	<h2>License</h2> 
+	<p>Licensed under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a>.</p> 
+	
+	<div id="socialise"> 
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="benpbarnett">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script> 
+ 
+	<h2>Comments</h2> 
+	<h3>Please DO NOT put bug reports on the comments below. Feel free to report any issues on the <a href="https://github.com/benbarnett/jQuery-Animate-Enhanced/issues">Github Issues</a> page.</h3> 
+ 
+	<div id="disqus_thread"></div> 
+	</div> 
+<script type="text/javascript"> 
+  /**
+    * var disqus_identifier; [Optional but recommended: Define a unique identifier (e.g. post id or slug) for this thread] 
+    */
+  (function() {
+   var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+   dsq.src = 'http://benbarnett.disqus.com/embed.js';
+   (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script> 
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript=benbarnett">comments powered by Disqus.</a></noscript> 
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a> 
+ 
+	
+	<a href="http://github.com/benbarnett/jQuery-Animate-Enhanced"><img style="position: fixed; top: 0; left: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_left_darkblue_121621.png" alt="Fork me on GitHub" /></a> 
+	
+	<script type="text/javascript" src="scripts/contrib/jquery-1.4.3.js"></script> 
+	<script type="text/javascript" src="scripts/src/jquery.animate-enhanced.js"></script> 
+	<script type="text/javascript" charset="utf-8"> 
+		$('button#start').click(function() {
+			var results = $('p#results').html("Animating..."),
+			button = $(this).attr('disabled', 'disabled');
+			$('button:not(#start)').removeAttr('disabled');
+			
+			// CSS3 Container
+			$('.target-css').animate({left: "+=200px", width:320 }, 1500, function() {
+				results.html('first callback() fired, reversing...');
+				$(this).animate({left: "-=200px", width:280 }, 1500, function() {
+					results.html("second callback() fired");
+					button.removeAttr('disabled');
+					$('button:not(#start)').attr('disabled', 'disabled');
+				});
+			});
+			
+			// CSS3 Container (leaveTransforms)
+			$('.target-css-leave').animate({left: "+=200px", width:320, leaveTransforms:true }, 1500, function() {
+				$(this).animate({left: "-=200px", width:280, leaveTransforms:true }, 1500);
+			});
+			
+			// DOM container
+			$('.target-dom').animate({left: "+=200px", width:320, avoidTransforms:true }, 1500, function() {
+				$(this).animate({left: "-=200px", width:280, avoidTransforms:true }, 1500);
+			});
+		});
+	</script> 
+ 
+<script type="text/javascript"> 
+ 
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-8825585-11']);
+  _gaq.push(['_trackPageview']);
+ 
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+ 
+</script> 
+ 
+<script type="text/javascript"> 
+var disqus_shortname = 'benbarnett';
+(function () {
+  var s = document.createElement('script'); s.async = true;
+  s.src = 'http://disqus.com/forums/benbarnett/count.js';
+  (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+}());
+</script> 
+ 
+</body> 
+</html>
