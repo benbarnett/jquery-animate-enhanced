@@ -522,7 +522,7 @@ Changelog:
 							isDirection && prop.avoidTransforms === true ? cleanVal + "px" : cleanVal,
 							isDirection && prop.avoidTransforms !== true,
 							isTranslatable,
-							prop.useTranslate3d === true);
+							prop.useTranslate3d !== false);
 						
 					}
 					else {
