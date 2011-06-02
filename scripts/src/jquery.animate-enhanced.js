@@ -383,7 +383,11 @@ Changelog:
 				x: 0,
 				y: 0
 			};
-			
+		
+		if (!cStyle) {
+			return null;
+		}
+		
 		for (var i = cssPrefixes.length - 1; i >= 0; i--){
 			var transform = cStyle.getPropertyValue(cssPrefixes[i] + "transform");
 			if (transform && (/matrix/i).test(transform)) {
