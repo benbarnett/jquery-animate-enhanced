@@ -53,6 +53,10 @@ By default if the plugin is animating a left or a top property, the translate (2
 Changelog
 -----------------
 
+0.75 (15/06/2011):
+
+* Fixing issue #35 to pass actual object back as context for callback
+
 0.74 (28/05/2011):
 
 * Fixing issue #29 to play nice with 1.6

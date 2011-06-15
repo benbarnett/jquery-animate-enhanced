@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.74
+jquery.animate-enhanced plugin v0.75
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.75 (15/06/2011):
+		- Fixing issue #35 to pass actual object back as context for callback
+
 	0.74 (28/05/2011):
 		- Fixing issue #29 to play nice with 1.6+
 
@@ -423,7 +426,7 @@ Changelog:
 				if (callbackQueue === 0) {
 					// we're done, trigger the user callback					
 					if (typeof optall.complete === 'function') {
-						optall.complete.apply(elements, arguments); 
+						optall.complete.apply(elements[0], arguments); 
 					}
 				}
 			};
