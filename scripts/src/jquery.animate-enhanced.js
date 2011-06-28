@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.75
+jquery.animate-enhanced plugin v0.76
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.76 (28/06/2011):
+		- Fixing issue #37 - fixed stop() method (with gotoEnd == false)
+		
 	0.75 (15/06/2011):
 		- Fixing issue #35 to pass actual object back as context for callback
 
@@ -638,9 +641,9 @@ Changelog:
 							var explodedMatrix = restore[prop].replace(/^matrix\(/i, '').split(/, |\)$/g);	
 							
 							// apply the explicit left/top props						
-							restore['left'] = explodedMatrix[4]+'px' || 'auto';
-							restore['top'] = explodedMatrix[5]+'px' || 'auto';
-							
+							restore['left'] = (parseFloat(explodedMatrix[4]) + parseFloat(self.css('left')) + 'px') || 'auto';
+							restore['top'] = (parseFloat(explodedMatrix[5]) + parseFloat(self.css('top')) + 'px') || 'auto';
+
 							// remove the transformations
 							for (i = cssPrefixes.length - 1; i >= 0; i--){
 								restore[cssPrefixes[i]+'transform'] = '';
