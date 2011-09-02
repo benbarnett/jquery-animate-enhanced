@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.76
+jquery.animate-enhanced plugin v0.77
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.77 (02/09/2011):
+		- Adding feature on Github issue #44 - Use 3D Transitions by default
+		
 	0.76 (28/06/2011):
 		- Fixing issue #37 - fixed stop() method (with gotoEnd == false)
 		
@@ -176,7 +179,9 @@ Changelog:
 		
 		DATA_KEY = 'jQe',
 		CUBIC_BEZIER_OPEN = 'cubic-bezier(',
-		CUBIC_BEZIER_CLOSE = ')';
+		CUBIC_BEZIER_CLOSE = ')',
+		
+		use3DByDefault = false;
 		
 	
 	// ----------
@@ -186,7 +191,7 @@ Changelog:
    		thisStyle = thisBody.style,
 		transitionEndEvent = (thisStyle.WebkitTransition !== undefined) ? "webkitTransitionEnd" : (thisStyle.OTransition !== undefined) ? "oTransitionEnd" : "transitionend",
 		cssTransitionsSupported = thisStyle.WebkitTransition !== undefined || thisStyle.MozTransition !== undefined || thisStyle.OTransition !== undefined || thisStyle.transition !== undefined,
-		has3D = ('WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix());
+		has3D = use3DByDefault = ('WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix());
 	
 	
 	/**
@@ -240,7 +245,7 @@ Changelog:
 		@param {boolean} [use3D] Use translate3d if available?
 	*/
 	function _getTranslation(x, y, use3D) {
-		return (use3D === true && has3D) ? "translate3d("+x+"px,"+y+"px,0)" : "translate("+x+"px,"+y+"px)";
+		return ((use3D === true || use3DByDefault == true) && has3D) ? "translate3d("+x+"px,"+y+"px,0)" : "translate("+x+"px,"+y+"px)";
 	};
 	
 	
@@ -370,6 +375,19 @@ Changelog:
 		if ((prop == 'width' || prop == 'height') && (value === parseFloat(element.css(prop)))) is = false;
 		return is;
 	};
+	
+	
+	/**
+		@public
+		@name toggle3DByDefault
+		@function
+		@description Toggle for plugin settings to automatically use translate3d (where available). Usage: $.toggle3DByDefault
+	*/
+	jQuery.extend({
+		toggle3DByDefault: function() {
+			use3DByDefault = !use3DByDefault;
+		}
+	});
 	
 	
 	/**

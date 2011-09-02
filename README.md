@@ -53,6 +53,10 @@ By default if the plugin is animating a left or a top property, the translate (2
 Changelog
 -----------------
 
+0.77 (02/09/2011):
+
+* Adding feature on Github issue #44 - Use 3D Transitions by default
+
 0.76 (28/06/2011):
 
 * Fixing issue #37 - fixed stop() method (with gotoEnd == false)
