@@ -49,6 +49,11 @@ By default the plugin will use 2d translations due to wider browser support. Set
 * leaveTransforms: (Boolean)
 By default if the plugin is animating a left or a top property, the translate (2d or 3d depending on setting above) CSS3 transformation will be used. To preserve other layout dependencies, once the transition is complete, these transitions are removed and converted back to the real left and top values. Set this to true to skip this functionality.
 
+Note
+-----------------
+
+Since v0.77, the plugin will now automatically use 3D Translations where supported. To override this functionality, you can either use the parameter above, or run $.toggle3DByDefault();
+
 
 Changelog
 -----------------
