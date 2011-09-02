@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.77
+jquery.animate-enhanced plugin v0.78
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.78 (02/09/2011):
+		- Issue #18 - jQuery/$ reference joys
+
 	0.77 (02/09/2011):
 		- Adding feature on Github issue #44 - Use 3D Transitions by default
 		
@@ -156,7 +159,7 @@ Changelog:
 		- Less need for leaveTransforms = true due to better position detections
 */
 
-(function($, originalAnimateMethod, originalStopMethod) {
+(function(jQuery, originalAnimateMethod, originalStopMethod) {
 
 	// ----------
 	// Plugin variables
