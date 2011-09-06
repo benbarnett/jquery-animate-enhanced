@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.78
+jquery.animate-enhanced plugin v0.79
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.79 (06/09/2011):
+		- Issue #42 - Right negative position animation: please see issue notes on Github.
+
 	0.78 (02/09/2011):
 		- Issue #18 - jQuery/$ reference joys
 
@@ -217,7 +220,9 @@ Changelog:
 			translation = e.translation();
 		
 		if (prop == "left") cleanStart = parseInt(cleanCSSStart, 10) + translation.x;
+		if (prop == "right") cleanStart = parseInt(cleanCSSStart, 10) + translation.x;
 		if (prop == "top") cleanStart = parseInt(cleanCSSStart, 10) + translation.y;
+		if (prop == "bottom") cleanStart = parseInt(cleanCSSStart, 10) + translation.y;
 		
 		// deal with shortcuts
 		if (!parts && val == "show") {
@@ -274,9 +279,9 @@ Changelog:
 		if (isDirection) {
 			var meta = enhanceData.meta,
 				cleanPropertyValue = _cleanValue(e.css(property)) || 0,
-				stashedProperty = property + "_o";
+				stashedProperty = property + "_o";				
 			
-			offsetPosition = isDirection ? value - cleanPropertyValue : value;
+			offsetPosition = value - cleanPropertyValue;
 			
 			meta[property] = offsetPosition;
 			meta[stashedProperty] = e.css(property) == "auto" ? 0 + offsetPosition : cleanPropertyValue + offsetPosition || 0;
