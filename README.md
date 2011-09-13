@@ -58,6 +58,10 @@ Since v0.77, the plugin will now automatically use 3D Translations where support
 Changelog
 -----------------
 
+0.80 (13/09/2011):
+
+* Issue #28 - Report $(el).is(':animated') fix
+
 0.79 (06/09/2011):
 
 * Issue #42 - Right negative position animation: please see issue notes on Github

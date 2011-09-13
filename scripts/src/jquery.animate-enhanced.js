@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.79
+jquery.animate-enhanced plugin v0.80
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 	
 Changelog:
+	0.80 (13/09/2011):
+		- Issue #28 - Report $(el).is(':animated') fix
+
 	0.79 (06/09/2011):
 		- Issue #42 - Right negative position animation: please see issue notes on Github.
 
@@ -187,7 +190,8 @@ Changelog:
 		CUBIC_BEZIER_OPEN = 'cubic-bezier(',
 		CUBIC_BEZIER_CLOSE = ')',
 		
-		use3DByDefault = false;
+		use3DByDefault = false,
+		originalAnimatedFilter = null;
 		
 	
 	// ----------
@@ -198,6 +202,18 @@ Changelog:
 		transitionEndEvent = (thisStyle.WebkitTransition !== undefined) ? "webkitTransitionEnd" : (thisStyle.OTransition !== undefined) ? "oTransitionEnd" : "transitionend",
 		cssTransitionsSupported = thisStyle.WebkitTransition !== undefined || thisStyle.MozTransition !== undefined || thisStyle.OTransition !== undefined || thisStyle.transition !== undefined,
 		has3D = use3DByDefault = ('WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix());
+		
+		
+		
+	// ----------
+	// Extended :animated filter
+	// ----------
+	if ( jQuery.expr && jQuery.expr.filters ) {
+		originalAnimatedFilter = jQuery.expr.filters.animated;
+		jQuery.expr.filters.animated = function(elem) {
+			return jQuery(elem).data('events') && jQuery(elem).data('events')[transitionEndEvent] ? true : originalAnimatedFilter.call(this, elem);
+		}
+	}
 	
 	
 	/**
