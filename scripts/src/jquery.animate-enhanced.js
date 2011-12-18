@@ -104,7 +104,7 @@ Changelog:
 	0.60 (06/01/2011):
 		- Animate function rewrite in accordance with new queue system
 		- BUGFIX #8: Left/top position values always assumed relative rather than absolute
-		- BUGFIX #9: animation as last item in a chain — the chain is ignored?
+		- BUGFIX #9: animation as last item in a chain - the chain is ignored?
 		- BUGFIX: width/height CSS3 transformation with left/top working
 		
 	0.55 (22/12/2010):
@@ -170,10 +170,10 @@ Changelog:
 	// ----------
 	// Plugin variables
 	// ----------
-	var	cssTransitionProperties = ["top", "right", "bottom", "left", "opacity", "height", "width"],
-		directions = ["top", "right", "bottom", "left"],
-		cssPrefixes = ["", "-webkit-", "-moz-", "-o-"],
-		pluginOptions = ["avoidTransforms", "useTranslate3d", "leaveTransforms"],
+	var	cssTransitionProperties = ['top', 'right', 'bottom', 'left', 'opacity', 'height', 'width'],
+		directions = ['top', 'right', 'bottom', 'left'],
+		cssPrefixes = ['', '-webkit-', '-moz-', '-o-'],
+		pluginOptions = ['avoidTransforms', 'useTranslate3d', 'leaveTransforms'],
 		rfxnum = /^([+-]=)?([\d+-.]+)(.*)$/,
 		rupper = /([A-Z])/g,
 		defaultEnhanceData = { 
@@ -190,7 +190,6 @@ Changelog:
 		CUBIC_BEZIER_OPEN = 'cubic-bezier(',
 		CUBIC_BEZIER_CLOSE = ')',
 		
-		use3DByDefault = false,
 		originalAnimatedFilter = null;
 		
 	
@@ -198,10 +197,11 @@ Changelog:
 	// Check if this browser supports CSS3 transitions
 	// ----------
 	var thisBody = document.body || document.documentElement,
-   		thisStyle = thisBody.style,
-		transitionEndEvent = (thisStyle.WebkitTransition !== undefined) ? "webkitTransitionEnd" : (thisStyle.OTransition !== undefined) ? "oTransitionEnd" : "transitionend",
+		thisStyle = thisBody.style,
+		transitionEndEvent = (thisStyle.WebkitTransition !== undefined) ? 'webkitTransitionEnd' : (thisStyle.OTransition !== undefined) ? 'oTransitionEnd' : 'transitionend',
 		cssTransitionsSupported = thisStyle.WebkitTransition !== undefined || thisStyle.MozTransition !== undefined || thisStyle.OTransition !== undefined || thisStyle.transition !== undefined,
-		has3D = use3DByDefault = ('WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix());
+		has3D = ('WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix()),
+		use3DByDefault = has3D;
 		
 		
 		
@@ -212,7 +212,7 @@ Changelog:
 		originalAnimatedFilter = jQuery.expr.filters.animated;
 		jQuery.expr.filters.animated = function(elem) {
 			return jQuery(elem).data('events') && jQuery(elem).data('events')[transitionEndEvent] ? true : originalAnimatedFilter.call(this, elem);
-		}
+		};
 	}
 	
 	
@@ -228,20 +228,20 @@ Changelog:
 	*/
 	function _interpretValue(e, val, prop, isTransform) {	
 		var parts = rfxnum.exec(val),
-			start = e.css(prop) === "auto" ? 0 : e.css(prop),
-			cleanCSSStart = typeof start == "string" ? _cleanValue(start) : start,
-			cleanTarget = typeof val == "string" ? _cleanValue(val) : val,
+			start = e.css(prop) === 'auto' ? 0 : e.css(prop),
+			cleanCSSStart = typeof start == 'string' ? _cleanValue(start) : start,
+			cleanTarget = typeof val == 'string' ? _cleanValue(val) : val,
 			cleanStart = isTransform === true ? 0 : cleanCSSStart,
-			hidden = e.is(":hidden"),
+			hidden = e.is(':hidden'),
 			translation = e.translation();
 		
-		if (prop == "left") cleanStart = parseInt(cleanCSSStart, 10) + translation.x;
-		if (prop == "right") cleanStart = parseInt(cleanCSSStart, 10) + translation.x;
-		if (prop == "top") cleanStart = parseInt(cleanCSSStart, 10) + translation.y;
-		if (prop == "bottom") cleanStart = parseInt(cleanCSSStart, 10) + translation.y;
+		if (prop == 'left') cleanStart = parseInt(cleanCSSStart, 10) + translation.x;
+		if (prop == 'right') cleanStart = parseInt(cleanCSSStart, 10) + translation.x;
+		if (prop == 'top') cleanStart = parseInt(cleanCSSStart, 10) + translation.y;
+		if (prop == 'bottom') cleanStart = parseInt(cleanCSSStart, 10) + translation.y;
 		
 		// deal with shortcuts
-		if (!parts && val == "show") {
+		if (!parts && val == 'show') {
 			cleanStart = 1;
 			if (hidden) e.css({'display':'block', 'opacity': 0});
 		} else if (!parts && val == "hide") {
@@ -252,12 +252,12 @@ Changelog:
 			var end = parseFloat(parts[2]);
 
 			// If a +=/-= token was provided, we're doing a relative animation
-			if (parts[1]) end = ((parts[1] === "-=" ? -1 : 1) * end) + parseInt(cleanStart, 10);
+			if (parts[1]) end = ((parts[1] === '-=' ? -1 : 1) * end) + parseInt(cleanStart, 10);
 			return end;
 		} else {
 			return cleanStart;
 		}
-	};
+	}
 	
 	/**
 		@private
@@ -269,8 +269,8 @@ Changelog:
 		@param {boolean} [use3D] Use translate3d if available?
 	*/
 	function _getTranslation(x, y, use3D) {
-		return ((use3D === true || (use3DByDefault == true && use3D != false)) && has3D) ? "translate3d("+x+"px,"+y+"px,0)" : "translate("+x+"px,"+y+"px)";
-	};
+		return ((use3D === true || (use3DByDefault === true && use3D !== false)) && has3D) ? 'translate3d(' + x + 'px, ' + y + 'px, 0)' : 'translate(' + x + 'px,' + y + 'px)';
+	}
 	
 	
 	/**
@@ -295,12 +295,12 @@ Changelog:
 		if (isDirection) {
 			var meta = enhanceData.meta,
 				cleanPropertyValue = _cleanValue(e.css(property)) || 0,
-				stashedProperty = property + "_o";				
+				stashedProperty = property + '_o';
 			
 			offsetPosition = value - cleanPropertyValue;
 			
 			meta[property] = offsetPosition;
-			meta[stashedProperty] = e.css(property) == "auto" ? 0 + offsetPosition : cleanPropertyValue + offsetPosition || 0;
+			meta[stashedProperty] = e.css(property) == 'auto' ? 0 + offsetPosition : cleanPropertyValue + offsetPosition || 0;
 			enhanceData.meta = meta;
 			
 			// fix 0 issue (transition by 0 = nothing)
@@ -313,7 +313,7 @@ Changelog:
 		
 		// reapply data and return
 		return e.data(DATA_KEY, _applyCSSWithPrefix(enhanceData, property, duration, easing, offsetPosition, isTransform, isTranslatable, use3D));
-	};
+	}
 	
 	/**
 		@private
@@ -342,7 +342,7 @@ Changelog:
 		};
 		
 		return cssProperties;
-	};
+	}
 	
 	/**
 		@private
@@ -353,12 +353,12 @@ Changelog:
 	*/
 	function _isBoxShortcut(prop) {
 		for (var property in prop) {
-			if ((property == "width" || property == "height") && (prop[property] == "show" || prop[property] == "hide" || prop[property] == "toggle")) {
+			if ((property == 'width' || property == 'height') && (prop[property] == 'show' || prop[property] == 'hide' || prop[property] == 'toggle')) {
 				return true;
 			}
 		}
 		return false;
-	};
+	}
 	
 	
 	/**
@@ -371,7 +371,7 @@ Changelog:
 	function _isEmptyObject(obj) {
 		for (var i in obj) return false;
 		return true;
-	};
+	}
 	
 	
 	/**
@@ -383,7 +383,7 @@ Changelog:
 	*/
 	function _cleanValue(val) {
 		return parseFloat(val.replace(/px/i, ''));
-	};
+	}
 	
 	
 	/**
@@ -398,7 +398,7 @@ Changelog:
 		var is = jQuery.inArray(prop, cssTransitionProperties) > -1;
 		if ((prop == 'width' || prop == 'height') && (value === parseFloat(element.css(prop)))) is = false;
 		return is;
-	};
+	}
 	
 	
 	/**
@@ -432,16 +432,18 @@ Changelog:
 				y: 0
 			};
 			
-		for (var i = cssPrefixes.length - 1; i >= 0; i--){
-			var transform = cStyle.getPropertyValue(cssPrefixes[i] + "transform");
-			if (transform && (/matrix/i).test(transform)) {
-				var explodedMatrix = transform.replace(/^matrix\(/i, '').split(/, |\)$/g);
-				translation = {
-					x: parseInt(explodedMatrix[4], 10),
-					y: parseInt(explodedMatrix[5], 10)
-				};
+		if (cStyle) {
+			for (var i = cssPrefixes.length - 1; i >= 0; i--) {
+				var transform = cStyle.getPropertyValue(cssPrefixes[i] + 'transform');
+				if (transform && (/matrix/i).test(transform)) {
+					var explodedMatrix = transform.replace(/^matrix\(/i, '').split(/, |\)$/g);
+					translation = {
+						x: parseInt(explodedMatrix[4], 10),
+						y: parseInt(explodedMatrix[5], 10)
+					};
 				
-				break;
+					break;
+				}
 			}
 		}
 		
@@ -462,7 +464,7 @@ Changelog:
 	*/
 	jQuery.fn.animate = function(prop, speed, easing, callback) {
 		prop = prop || {};
-		var isTranslatable = !(typeof prop["bottom"] !== "undefined" || typeof prop["right"] !== "undefined"),
+		var isTranslatable = !(typeof prop['bottom'] !== 'undefined' || typeof prop['right'] !== 'undefined'),
 			optall = jQuery.speed(speed, easing, callback),
 			elements = this,
 			callbackQueue = 0,
@@ -480,7 +482,7 @@ Changelog:
 			return originalAnimateMethod.apply(this, arguments);
 		} 
 
-		return this[ optall.queue === true ? "queue" : "each" ](function() {
+		return this[ optall.queue === true ? 'queue' : 'each' ](function() {
 			var self = jQuery(this),
 				opt = jQuery.extend({}, optall),
 				cssCallback = function() {
@@ -515,7 +517,7 @@ Changelog:
 					
 					// if we used the fadeOut shortcut make sure elements are display:none
 					if (prop.opacity === 'hide') {
-						self.css('display', 'none');
+						self.css({'display': 'none', 'opacity': ''});
 					}
 			
 					// reset
@@ -537,6 +539,7 @@ Changelog:
 					easeInSine:     CUBIC_BEZIER_OPEN + '0.470, 0.000, 0.745, 0.715' + CUBIC_BEZIER_CLOSE,
 					easeInExpo:     CUBIC_BEZIER_OPEN + '0.950, 0.050, 0.795, 0.035' + CUBIC_BEZIER_CLOSE,
 					easeInCirc:     CUBIC_BEZIER_OPEN + '0.600, 0.040, 0.980, 0.335' + CUBIC_BEZIER_CLOSE,
+					easeInBack:     CUBIC_BEZIER_OPEN + '0.600, -0.280, 0.735, 0.045' + CUBIC_BEZIER_CLOSE,
 					easeOutQuad:    CUBIC_BEZIER_OPEN + '0.250, 0.460, 0.450, 0.940' + CUBIC_BEZIER_CLOSE,
 					easeOutCubic:   CUBIC_BEZIER_OPEN + '0.215, 0.610, 0.355, 1.000' + CUBIC_BEZIER_CLOSE,
 					easeOutQuart:   CUBIC_BEZIER_OPEN + '0.165, 0.840, 0.440, 1.000' + CUBIC_BEZIER_CLOSE,
@@ -544,16 +547,18 @@ Changelog:
 					easeOutSine:    CUBIC_BEZIER_OPEN + '0.390, 0.575, 0.565, 1.000' + CUBIC_BEZIER_CLOSE,
 					easeOutExpo:    CUBIC_BEZIER_OPEN + '0.190, 1.000, 0.220, 1.000' + CUBIC_BEZIER_CLOSE,
 					easeOutCirc:    CUBIC_BEZIER_OPEN + '0.075, 0.820, 0.165, 1.000' + CUBIC_BEZIER_CLOSE,
+					easeOutBack:    CUBIC_BEZIER_OPEN + '0.175, 0.885, 0.320, 1.275' + CUBIC_BEZIER_CLOSE,
 					easeInOutQuad:  CUBIC_BEZIER_OPEN + '0.455, 0.030, 0.515, 0.955' + CUBIC_BEZIER_CLOSE,
 					easeInOutCubic: CUBIC_BEZIER_OPEN + '0.645, 0.045, 0.355, 1.000' + CUBIC_BEZIER_CLOSE,
 					easeInOutQuart: CUBIC_BEZIER_OPEN + '0.770, 0.000, 0.175, 1.000' + CUBIC_BEZIER_CLOSE,
 					easeInOutQuint: CUBIC_BEZIER_OPEN + '0.860, 0.000, 0.070, 1.000' + CUBIC_BEZIER_CLOSE,
 					easeInOutSine:  CUBIC_BEZIER_OPEN + '0.445, 0.050, 0.550, 0.950' + CUBIC_BEZIER_CLOSE,
 					easeInOutExpo:  CUBIC_BEZIER_OPEN + '1.000, 0.000, 0.000, 1.000' + CUBIC_BEZIER_CLOSE,
-					easeInOutCirc:  CUBIC_BEZIER_OPEN + '0.785, 0.135, 0.150, 0.860' + CUBIC_BEZIER_CLOSE
+					easeInOutCirc:  CUBIC_BEZIER_OPEN + '0.785, 0.135, 0.150, 0.860' + CUBIC_BEZIER_CLOSE,
+					easeInOutBack:  CUBIC_BEZIER_OPEN + '0.680, -0.550, 0.265, 1.550' + CUBIC_BEZIER_CLOSE
 				},
 				domProperties = {}, 
-				cssEasing = easings[opt.easing || "swing"] ? easings[opt.easing || "swing"] : opt.easing || "swing";
+				cssEasing = easings[opt.easing || 'swing'] ? easings[opt.easing || 'swing'] : opt.easing || 'swing';
 						
 			// seperate out the properties for the relevant animation functions
 			for (var p in prop) {
@@ -567,7 +572,7 @@ Changelog:
 							p, 
 							opt.duration, 
 							cssEasing, 
-							isDirection && prop.avoidTransforms === true ? cleanVal + "px" : cleanVal,
+							isDirection && prop.avoidTransforms === true ? cleanVal + 'px' : cleanVal,
 							isDirection && prop.avoidTransforms !== true,
 							isTranslatable,
 							prop.useTranslate3d === true);
@@ -611,7 +616,7 @@ Changelog:
 				callbackQueue++;
 				originalAnimateMethod.apply(self, [domProperties, {
 					duration: opt.duration, 
-					easing: jQuery.easing[opt.easing] ? opt.easing : (jQuery.easing.swing ? "swing" : "linear"), 
+					easing: jQuery.easing[opt.easing] ? opt.easing : (jQuery.easing.swing ? 'swing' : 'linear'),
 					complete: propertyCallback,
 					queue: opt.queue
 				}]);
@@ -624,6 +629,7 @@ Changelog:
 	
     jQuery.fn.animate.defaults = {};
 	
+
 	/**
 		@public
 		@name jQuery.fn.stop
@@ -659,7 +665,7 @@ Changelog:
 				var selfCSSData = self.data(DATA_KEY);
 
 				if (gotoEnd) {
-				    // grab end state properties
+					// grab end state properties
 					restore = selfCSSData.secondary;
 					
 					if (!leaveTransforms && typeof selfCSSData.meta['left_o'] !== undefined || typeof selfCSSData.meta['top_o'] !== undefined) {						
@@ -671,8 +677,7 @@ Changelog:
 							restore[cssPrefixes[i]+'transform'] = '';
 						}
 					}
-				}
-				else {
+				} else {
 					// grab current properties
 					for (var prop in self.data(DATA_KEY).secondary){
 						prop = prop.replace( rupper, "-$1" ).toLowerCase();
@@ -691,7 +696,7 @@ Changelog:
 								restore[cssPrefixes[i]+'transform'] = '';
 							}
 						}
-				    }
+					}
 				}
 				
 				// remove transition timing functions
