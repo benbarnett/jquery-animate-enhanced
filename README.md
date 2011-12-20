@@ -58,6 +58,13 @@ Since v0.77, the plugin will now automatically use 3D Translations where support
 Changelog
 -----------------
 
+0.85 (20/12/2011):
+
+* Merge Pull request #57 from Kronuz
+* Codebase cleaned and now passes jshint.
+* Fixed a few bugs (it now saves and restores the original css transition properties).
+* fadeOut() is fixed, it wasn't restoring the opacity after hiding it.
+
 0.80 (13/09/2011):
 
 * Issue #28 - Report $(el).is(':animated') fix
