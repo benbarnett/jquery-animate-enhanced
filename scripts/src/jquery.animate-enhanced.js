@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.85
+jquery.animate-enhanced plugin v0.86
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	0.86 (9/1/2012):
+		- Strict JS fix for undefined variable
+
 	0.85 (20/12/2011):
 		- Merge Pull request #57 from Kronuz
 		- Codebase cleaned and now passes jshint.
@@ -525,7 +528,7 @@ Changelog:
 
 					// convert translations to left & top for layout
 					if (prop.leaveTransforms !== true) {
-						for (i = cssPrefixes.length - 1; i >= 0; i--) {
+						for (var i = cssPrefixes.length - 1; i >= 0; i--) {
 							restore[cssPrefixes[i] + 'transform'] = '';
 						}
 						if (isTranslatable && typeof selfCSSData.meta !== 'undefined') {

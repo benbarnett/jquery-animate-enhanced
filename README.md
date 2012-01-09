@@ -58,6 +58,10 @@ Since v0.77, the plugin will now automatically use 3D Translations where support
 Changelog
 -----------------
 
+0.86 (9/1/2012):
+
+* Strict JS fix for undefined variable
+
 0.85 (20/12/2011):
 
 * Merge Pull request #57 from Kronuz
