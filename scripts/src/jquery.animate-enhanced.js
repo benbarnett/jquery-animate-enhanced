@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.87
+jquery.animate-enhanced plugin v0.88
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	0.88 (24/1/2012):
+		- Fix Issue #67 for HighchartsJS compatibility
+
 	0.87 (24/1/2012):
 		- Fix Issue #66 selfCSSData.original is undefined
 
@@ -239,6 +242,9 @@ Changelog:
 		@param {boolean} [isTransform] Is this a CSS3 transform?
 	*/
 	function _interpretValue(e, val, prop, isTransform) {
+		// this is a nasty fix, but we check for prop == 'd' to see if we're dealing with SVG, and abort
+		if (prop == "d") return;
+		
 		var parts = rfxnum.exec(val),
 			start = e.css(prop) === 'auto' ? 0 : e.css(prop),
 			cleanCSSStart = typeof start == 'string' ? _cleanValue(start) : start,

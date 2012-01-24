@@ -1,0 +1,84 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+  <title>Highcharts Demo</title>
+  
+  <style type='text/css'>
+    
+  </style>
+  
+
+
+<script type='text/javascript'>//<![CDATA[ 
+var VanillaRunOnDomReady = function() {
+var chart = new Highcharts.Chart({
+
+    chart: {
+        renderTo: 'container',
+        animation: false
+    },
+
+    xAxis: {
+        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    },
+    plotOptions: {
+        series: { animation: false }
+    },
+
+    series: [{
+        data: [29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]
+    }]
+
+});
+
+i = 1;
+$('#update').click(function() {
+    chart.series[0].data[0].update(i++ % 2 ? 200 : 0);
+});
+
+}
+
+var alreadyrunflag = 0;
+
+if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", function(){
+        alreadyrunflag=1; 
+        VanillaRunOnDomReady();
+    }, false);
+else if (document.all && !window.opera) {
+    document.write('<script type="text/javascript" id="contentloadtag" defer="defer" src="javascript:void(0)"><\/script>');
+    var contentloadtag = document.getElementById("contentloadtag")
+    contentloadtag.onreadystatechange=function(){
+        if (this.readyState=="complete"){
+            alreadyrunflag=1;
+            VanillaRunOnDomReady();
+        }
+    }
+}
+
+window.onload = function(){
+  setTimeout("if (!alreadyrunflag){VanillaRunOnDomReady}", 0);
+}//]]>  
+
+</script>
+
+
+</head>
+<body>
+  <script type="text/javascript" src="https://bit.ly/jqsource"></script>
+<script type="text/javascript" src="../scripts/src/jquery.animate-enhanced.js"></script>
+<script type="text/javascript" src="http://highcharts.com/js/testing.js"></script>
+
+
+<div id="container" style="height: 300px"></div>
+
+<button id="update">Update chart</button>
+
+  
+</body>
+
+
+</html>
+

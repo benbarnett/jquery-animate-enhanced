@@ -58,6 +58,10 @@ Since v0.77, the plugin will now automatically use 3D Translations where support
 Changelog
 -----------------
 
+0.88 (24/1/2012):
+
+* Fix Issue #67 for HighchartsJS compatibility
+
 0.87 (24/1/2012):
 
 * Fix Issue #66 selfCSSData.original is undefined
