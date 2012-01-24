@@ -58,6 +58,10 @@ Since v0.77, the plugin will now automatically use 3D Translations where support
 Changelog
 -----------------
 
+0.87 (24/1/2012):
+
+* Fix Issue #66 selfCSSData.original is undefined
+
 0.86 (9/1/2012):
 
 * Strict JS fix for undefined variable

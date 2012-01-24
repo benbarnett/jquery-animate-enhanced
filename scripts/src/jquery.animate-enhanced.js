@@ -1,11 +1,11 @@
 /*
-jquery.animate-enhanced plugin v0.86
+jquery.animate-enhanced plugin v0.87
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
 @benpbarnett
 ---
-Copyright (c) 2011 Ben Barnett
+Copyright (c) 2012 Ben Barnett
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	0.87 (24/1/2012):
+		- Fix Issue #66 selfCSSData.original is undefined
+
 	0.86 (9/1/2012):
 		- Strict JS fix for undefined variable
 
@@ -523,7 +526,7 @@ Changelog:
 			var self = jQuery(this),
 				opt = jQuery.extend({}, optall),
 				cssCallback = function() {
-					var selfCSSData = self.data(DATA_KEY) || {},
+					var selfCSSData = self.data(DATA_KEY) || { original: {} },
 						restore = {};
 
 					// convert translations to left & top for layout
