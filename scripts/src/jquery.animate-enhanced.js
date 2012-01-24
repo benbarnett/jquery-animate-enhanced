@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	0.89 (24/1/2012):
+		- Adding 'avoidCSSTransitions' property. Set to true to disable entire plugin. (Issue #47)
+
 	0.88 (24/1/2012):
 		- Fix Issue #67 for HighchartsJS compatibility
 
@@ -447,13 +450,13 @@ Changelog:
 	}
 
 
-	/**
-		@public
-		@name toggle3DByDefault
-		@function
-		@description Toggle for plugin settings to automatically use translate3d (where available). Usage: $.toggle3DByDefault
-	*/
 	jQuery.extend({
+		/**
+			@public
+			@name toggle3DByDefault
+			@function
+			@description Toggle for plugin settings to automatically use translate3d (where available). Usage: $.toggle3DByDefault
+		*/
 		toggle3DByDefault: function() {
 			use3DByDefault = !use3DByDefault;
 		}
@@ -524,7 +527,7 @@ Changelog:
 				}
 			};
 
-		if (!cssTransitionsSupported || _isEmptyObject(prop) || _isBoxShortcut(prop) || optall.duration <= 0 || (jQuery.fn.animate.defaults.avoidTransforms === true && prop['avoidTransforms'] !== false)) {
+		if (prop['avoidCSSTransitions'] === true || !cssTransitionsSupported || _isEmptyObject(prop) || _isBoxShortcut(prop) || optall.duration <= 0 || (jQuery.fn.animate.defaults.avoidTransforms === true && prop['avoidTransforms'] !== false)) {
 			return originalAnimateMethod.apply(this, arguments);
 		}
 

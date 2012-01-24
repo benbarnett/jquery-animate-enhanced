@@ -48,6 +48,8 @@ By default the plugin will convert left and top animations to the CSS3 style -we
 This will be auto-detected and set to true if the browser supports it. Set to true/false to force a specific mode. 3D is recommended for iPhone/iPad development ([here's why](http://www.benbarnett.net/2010/08/30/writing-html-and-css-for-mobile-safari-just-the-same-old-code/)).
 * leaveTransforms: (Boolean)
 By default if the plugin is animating a left or a top property, the translate (2d or 3d depending on setting above) CSS3 transformation will be used. To preserve other layout dependencies, once the transition is complete, these transitions are removed and converted back to the real left and top values. Set this to true to skip this functionality.
+* avoidCSSTransitions: (Boolean)
+Set this to true to revert to native animate() method, avoiding the plugin entirely.
 
 Note
 -----------------
@@ -57,6 +59,10 @@ Since v0.77, the plugin will now automatically use 3D Translations where support
 
 Changelog
 -----------------
+
+0.89 (24/1/2012):
+
+* Adding 'avoidCSSTransitions' property. Set to true to disable entire plugin.
 
 0.88 (24/1/2012):
 
