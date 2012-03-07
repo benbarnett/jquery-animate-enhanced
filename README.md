@@ -77,6 +77,10 @@ Since v0.77, the plugin will now automatically use 3D Translations where support
 Changelog
 -----------------
 
+0.90 (7/3/2012):
+
+* Adding public $.toggleDisabledByDefault() feature to disable entire plugin by default (Issue #73)
+
 0.89 (24/1/2012):
 
 * Adding 'avoidCSSTransitions' property. Set to true to disable entire plugin.
