@@ -49,7 +49,24 @@ This will be auto-detected and set to true if the browser supports it. Set to tr
 * leaveTransforms: (Boolean)
 By default if the plugin is animating a left or a top property, the translate (2d or 3d depending on setting above) CSS3 transformation will be used. To preserve other layout dependencies, once the transition is complete, these transitions are removed and converted back to the real left and top values. Set this to true to skip this functionality.
 * avoidCSSTransitions: (Boolean)
-Set this to true to revert to native animate() method, avoiding the plugin entirely.
+Set this to true to revert to native animate() method, avoiding the plugin entirely. The default for this setting is false, but can be overridden using $.toggleDisabledByDefault()
+
+
+Useful methods
+-----------------
+
+The following methods have been added to the public jQuery object, which you may or may not find useful:
+
+* $.toggle3DByDefault()
+Toggle for plugin settings to automatically use translate3d (where available; its safe to set to true even if the browser doesn't support).
+Returns new setting
+* $.toggleDisabledByDefault()
+Toggle the plugin to be disabled by default (can be overridden per animation with avoidCSSTransitions described above)
+Returns new setting
+* $(e).translation()
+Returns current X and Y coordinates for (e) no matter how the element is being positioned
+Returns in the format { x: 0, y: 0 }
+
 
 Note
 -----------------

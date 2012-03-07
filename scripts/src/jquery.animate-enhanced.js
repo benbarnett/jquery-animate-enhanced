@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.88
+jquery.animate-enhanced plugin v0.90
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	0.90 (7/3/2012):
+		- Adding public $.toggleDisabledByDefault() feature to disable entire plugin by default (Issue #73)
+
 	0.89 (24/1/2012):
 		- Adding 'avoidCSSTransitions' property. Set to true to disable entire plugin. (Issue #47)
 
@@ -208,7 +211,8 @@ Changelog:
 		CUBIC_BEZIER_OPEN = 'cubic-bezier(',
 		CUBIC_BEZIER_CLOSE = ')',
 
-		originalAnimatedFilter = null;
+		originalAnimatedFilter = null,
+		pluginDisabledDefault = false;
 
 
 	// ----------
@@ -458,7 +462,18 @@ Changelog:
 			@description Toggle for plugin settings to automatically use translate3d (where available). Usage: $.toggle3DByDefault
 		*/
 		toggle3DByDefault: function() {
-			use3DByDefault = !use3DByDefault;
+			return use3DByDefault = !use3DByDefault;
+		},
+		
+		
+		/**
+			@public
+			@name toggleEnabledByDefault
+			@function
+			@description Toggle the plugin to be disabled by default (can be overridden per animation with avoidCSSTransitions)
+		*/
+		toggleDisabledByDefault: function() {
+			return pluginDisabledDefault = !pluginDisabledDefault;
 		}
 	});
 
@@ -525,9 +540,10 @@ Changelog:
 						optall.complete.apply(elements[0], arguments);
 					}
 				}
-			};
+			},
+			bypassPlugin = (typeof prop['avoidCSSTransitions'] !== 'undefined') ? prop['avoidCSSTransitions'] : pluginDisabledDefault;
 
-		if (prop['avoidCSSTransitions'] === true || !cssTransitionsSupported || _isEmptyObject(prop) || _isBoxShortcut(prop) || optall.duration <= 0 || (jQuery.fn.animate.defaults.avoidTransforms === true && prop['avoidTransforms'] !== false)) {
+		if (bypassPlugin === true || !cssTransitionsSupported || _isEmptyObject(prop) || _isBoxShortcut(prop) || optall.duration <= 0 || (jQuery.fn.animate.defaults.avoidTransforms === true && prop['avoidTransforms'] !== false)) {
 			return originalAnimateMethod.apply(this, arguments);
 		}
 
