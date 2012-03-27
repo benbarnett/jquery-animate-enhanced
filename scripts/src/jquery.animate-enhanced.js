@@ -191,7 +191,7 @@ Changelog:
 	// ----------
 	// Plugin variables
 	// ----------
-	var	cssTransitionProperties = ['top', 'right', 'bottom', 'left', 'opacity', 'height', 'width'],
+	var	cssTransitionProperties = ['top', 'right', 'bottom', 'left', 'opacity', 'height', 'width', 'margin-left', 'margin-right', 'margin-top', 'margin-bottom'],
 		directions = ['top', 'right', 'bottom', 'left'],
 		cssPrefixes = ['', '-webkit-', '-moz-', '-o-'],
 		pluginOptions = ['avoidTransforms', 'useTranslate3d', 'leaveTransforms'],
@@ -621,6 +621,11 @@ Changelog:
 					var isDirection = jQuery.inArray(p, directions) > -1,
 						cleanVal = _interpretValue(self, prop[p], p, (isDirection && prop.avoidTransforms !== true));
 
+					// converts marginLeft to margin-left, etc...
+					p = p.replace(/([A-Z])/g, function(s, group1) {
+					    return '-' + group1.toLowerCase();
+					});
+					
 					if (prop.avoidTransforms !== true && _appropriateProperty(p, cleanVal, self)) {
 						_applyCSSTransition(
 							self,
