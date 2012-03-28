@@ -349,7 +349,7 @@ Changelog:
 			offsetPosition = value,
 			isDirection = jQuery.inArray(property, directions) > -1;
 
-		if (isDirection) {
+		if (isDirection && isTranslatable) {
 			var meta = enhanceData.meta,
 				cleanPropertyValue = _cleanValue(e.css(property)) || 0,
 				stashedProperty = property + '_o';
@@ -408,7 +408,7 @@ Changelog:
 				td = cssPrefixes[i] + 'transition-duration',
 				tf = cssPrefixes[i] + 'transition-timing-function';
 
-			var cssProperty = (transform ? cssPrefixes[i] + 'transform' : property);
+			property = (transform ? cssPrefixes[i] + 'transform' : property);
 
 			if (saveOriginal) {
 				original[tp] = e.css(tp) || '';
@@ -416,9 +416,9 @@ Changelog:
 				original[tf] = e.css(tf) || '';
 			}
 
-			secondary[cssProperty] = transform ? _getTranslation(property === 'left' ? meta.left : -meta.right, property === 'top' ? meta.top : -meta.bottom, use3D) : value;
+			secondary[property] = transform ? _getTranslation(meta.left, meta.top, use3D) : value;
 
-			properties[tp] = (properties[tp] ? properties[tp] + ',' : '') + cssProperty;
+			properties[tp] = (properties[tp] ? properties[tp] + ',' : '') + property;
 			properties[td] = (properties[td] ? properties[td] + ',' : '') + duration + 'ms';
 			properties[tf] = (properties[tf] ? properties[tf] + ',' : '') + easing;
 		}
@@ -570,7 +570,7 @@ Changelog:
 	*/
 	jQuery.fn.animate = function(prop, speed, easing, callback) {
 		prop = prop || {};
-		var isTranslatable = (typeof prop['top'] === 'undefined' || typeof prop['bottom'] === 'undefined') && (typeof prop['left'] === 'undefined' || typeof prop['right'] === 'undefined'),
+		var isTranslatable = !(typeof prop['bottom'] !== 'undefined' || typeof prop['right'] !== 'undefined'),
 			optall = jQuery.speed(speed, easing, callback),
 			elements = this,
 			callbackQueue = 0,
