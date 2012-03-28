@@ -408,7 +408,7 @@ Changelog:
 				td = cssPrefixes[i] + 'transition-duration',
 				tf = cssPrefixes[i] + 'transition-timing-function';
 
-			property = (transform ? cssPrefixes[i] + 'transform' : property);
+			var cssProperty = (transform ? cssPrefixes[i] + 'transform' : property);
 
 			if (saveOriginal) {
 				original[tp] = e.css(tp) || '';
@@ -416,9 +416,9 @@ Changelog:
 				original[tf] = e.css(tf) || '';
 			}
 
-			secondary[property] = transform ? _getTranslation(meta.left, meta.top, use3D) : value;
+			secondary[cssProperty] = transform ? _getTranslation(property === 'left' ? meta.left : -meta.right, property === 'top' ? meta.top : -meta.bottom, use3D) : value;
 
-			properties[tp] = (properties[tp] ? properties[tp] + ',' : '') + property;
+			properties[tp] = (properties[tp] ? properties[tp] + ',' : '') + cssProperty;
 			properties[td] = (properties[td] ? properties[td] + ',' : '') + duration + 'ms';
 			properties[tf] = (properties[tf] ? properties[tf] + ',' : '') + easing;
 		}
@@ -570,7 +570,7 @@ Changelog:
 	*/
 	jQuery.fn.animate = function(prop, speed, easing, callback) {
 		prop = prop || {};
-		var isTranslatable = !(typeof prop['bottom'] !== 'undefined' || typeof prop['right'] !== 'undefined'),
+		var isTranslatable = !(typeof prop['bottom'] !== 'undefined' && typeof prop['top'] !== 'undefined' || typeof prop['right'] !== 'undefined' && typeof prop['left'] !== 'undefined'),
 			optall = jQuery.speed(speed, easing, callback),
 			elements = this,
 			callbackQueue = 0,
@@ -603,11 +603,11 @@ Changelog:
 						}
 						if (isTranslatable && typeof selfCSSData.meta !== 'undefined') {
 							for (var j = 0, dir; (dir = directions[j]); ++j) {
-								restore[dir] = selfCSSData.meta[dir + '_o'] + 'px';
+								restore[dir] = (selfCSSData.meta[dir + '_o'] || 0) + 'px';
 							}
 						}
 					}
-
+					
 					// remove transition timing functions
 					self.
 						unbind(transitionEndEvent).
