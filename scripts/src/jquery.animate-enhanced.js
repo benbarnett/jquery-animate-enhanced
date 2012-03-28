@@ -408,7 +408,7 @@ Changelog:
 				td = cssPrefixes[i] + 'transition-duration',
 				tf = cssPrefixes[i] + 'transition-timing-function';
 
-			property = (transform ? cssPrefixes[i] + 'transform' : property);
+			var cssProperty = (transform ? cssPrefixes[i] + 'transform' : property);
 
 			if (saveOriginal) {
 				original[tp] = e.css(tp) || '';
@@ -416,9 +416,9 @@ Changelog:
 				original[tf] = e.css(tf) || '';
 			}
 
-			secondary[property] = transform ? _getTranslation(meta.left, meta.top, use3D) : value;
+			secondary[cssProperty] = transform ? _getTranslation(property === 'left' ? meta.left : -meta.right, property === 'top' ? meta.top : -meta.bottom, use3D) : value;
 
-			properties[tp] = (properties[tp] ? properties[tp] + ',' : '') + property;
+			properties[tp] = (properties[tp] ? properties[tp] + ',' : '') + cssProperty;
 			properties[td] = (properties[td] ? properties[td] + ',' : '') + duration + 'ms';
 			properties[tf] = (properties[tf] ? properties[tf] + ',' : '') + easing;
 		}
@@ -570,7 +570,7 @@ Changelog:
 	*/
 	jQuery.fn.animate = function(prop, speed, easing, callback) {
 		prop = prop || {};
-		var isTranslatable = !(typeof prop['bottom'] !== 'undefined' || typeof prop['right'] !== 'undefined'),
+		var isTranslatable = (typeof prop['top'] === 'undefined' || typeof prop['bottom'] === 'undefined') && (typeof prop['left'] === 'undefined' || typeof prop['right'] === 'undefined'),
 			optall = jQuery.speed(speed, easing, callback),
 			elements = this,
 			callbackQueue = 0,
@@ -723,10 +723,12 @@ Changelog:
 					// grab end state properties
 					restore = selfCSSData.secondary;
 
-					if (!leaveTransforms && typeof selfCSSData.meta['left_o'] !== undefined || typeof selfCSSData.meta['top_o'] !== undefined) {
-						restore['left'] = typeof selfCSSData.meta['left_o'] !== undefined ? selfCSSData.meta['left_o'] : 'auto';
-						restore['top'] = typeof selfCSSData.meta['top_o'] !== undefined ? selfCSSData.meta['top_o'] : 'auto';
-
+					if (!leaveTransforms && typeof selfCSSData.meta['left_o'] !== undefined || typeof selfCSSData.meta['right_o'] !== undefined || typeof selfCSSData.meta['top_o'] !== undefined || typeof selfCSSData.meta['bottom_o'] !== undefined) {
+						restore['left']   = typeof selfCSSData.meta['left_o']   !== undefined ? selfCSSData.meta['left_o']   : 'auto';
+						restore['right']  = typeof selfCSSData.meta['right_o']  !== undefined ? selfCSSData.meta['right_o']  : 'auto';
+						restore['top']    = typeof selfCSSData.meta['top_o']    !== undefined ? selfCSSData.meta['top_o']    : 'auto';
+						restore['bottom'] = typeof selfCSSData.meta['bottom_o'] !== undefined ? selfCSSData.meta['bottom_o'] : 'auto';
+						
 						// remove the transformations
 						for (i = cssPrefixes.length - 1; i >= 0; i--) {
 							restore[cssPrefixes[i]+'transform'] = '';
@@ -741,13 +743,20 @@ Changelog:
 								prop = prop.replace(rupper, '-$1').toLowerCase();
 								restore[prop] = cStyle.getPropertyValue(prop);
 
-								// is this a matrix property? extract left and top and apply
+								// is this a matrix property? extract left/right/top/bottom and apply
 								if (!leaveTransforms && (/matrix/i).test(restore[prop])) {
 									var explodedMatrix = restore[prop].replace(/^matrix\(/i, '').split(/, |\)$/g);
+									
+									var left   = self.css('left'),
+										right  = self.css('right'),
+										top    = self.css('top'),
+										bottom = self.css('bottom');
 
-									// apply the explicit left/top props
-									restore['left'] = (parseFloat(explodedMatrix[4]) + parseFloat(self.css('left')) + 'px') || 'auto';
-									restore['top'] = (parseFloat(explodedMatrix[5]) + parseFloat(self.css('top')) + 'px') || 'auto';
+									// apply the explicit left/right/top/bottom props
+									restore['left']   = left   === 'auto' ? 'auto' : ( parseFloat(explodedMatrix[4]) + parseFloat(self.css('left')))   + 'px';
+									restore['right']  = right  === 'auto' ? 'auto' : (-parseFloat(explodedMatrix[4]) + parseFloat(self.css('right')))  + 'px';
+									restore['top']    = top    === 'auto' ? 'auto' : ( parseFloat(explodedMatrix[5]) + parseFloat(self.css('top')))    + 'px';
+									restore['bottom'] = bottom === 'auto' ? 'auto' : (-parseFloat(explodedMatrix[5]) + parseFloat(self.css('bottom'))) + 'px';
 
 									// remove the transformations
 									for (i = cssPrefixes.length - 1; i >= 0; i--) {
