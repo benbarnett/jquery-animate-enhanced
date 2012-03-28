@@ -191,7 +191,7 @@ Changelog:
 	// ----------
 	// Plugin variables
 	// ----------
-	var	cssTransitionProperties = ['top', 'right', 'bottom', 'left', 'opacity', 'height', 'width'],
+	var	cssTransitionProperties = ['top', 'right', 'bottom', 'left', 'opacity', 'height', 'width', 'margin-left', 'margin-right', 'margin-top', 'margin-bottom'],
 		directions = ['top', 'right', 'bottom', 'left'],
 		cssPrefixes = ['', '-webkit-', '-moz-', '-o-'],
 		pluginOptions = ['avoidTransforms', 'useTranslate3d', 'leaveTransforms'],
@@ -210,6 +210,37 @@ Changelog:
 		DATA_KEY = 'jQe',
 		CUBIC_BEZIER_OPEN = 'cubic-bezier(',
 		CUBIC_BEZIER_CLOSE = ')',
+		easings = {
+				bounce: CUBIC_BEZIER_OPEN + '0.0, 0.35, .5, 1.3' + CUBIC_BEZIER_CLOSE,
+				linear: 'linear',
+				swing: 'ease-in-out',
+
+				// Penner equation approximations from Matthew Lein's Ceaser: http://matthewlein.com/ceaser/
+				easeInQuad:     CUBIC_BEZIER_OPEN + '0.550, 0.085, 0.680, 0.530' + CUBIC_BEZIER_CLOSE,
+				easeInCubic:    CUBIC_BEZIER_OPEN + '0.550, 0.055, 0.675, 0.190' + CUBIC_BEZIER_CLOSE,
+				easeInQuart:    CUBIC_BEZIER_OPEN + '0.895, 0.030, 0.685, 0.220' + CUBIC_BEZIER_CLOSE,
+				easeInQuint:    CUBIC_BEZIER_OPEN + '0.755, 0.050, 0.855, 0.060' + CUBIC_BEZIER_CLOSE,
+				easeInSine:     CUBIC_BEZIER_OPEN + '0.470, 0.000, 0.745, 0.715' + CUBIC_BEZIER_CLOSE,
+				easeInExpo:     CUBIC_BEZIER_OPEN + '0.950, 0.050, 0.795, 0.035' + CUBIC_BEZIER_CLOSE,
+				easeInCirc:     CUBIC_BEZIER_OPEN + '0.600, 0.040, 0.980, 0.335' + CUBIC_BEZIER_CLOSE,
+				easeInBack:     CUBIC_BEZIER_OPEN + '0.600, -0.280, 0.735, 0.045' + CUBIC_BEZIER_CLOSE,
+				easeOutQuad:    CUBIC_BEZIER_OPEN + '0.250, 0.460, 0.450, 0.940' + CUBIC_BEZIER_CLOSE,
+				easeOutCubic:   CUBIC_BEZIER_OPEN + '0.215, 0.610, 0.355, 1.000' + CUBIC_BEZIER_CLOSE,
+				easeOutQuart:   CUBIC_BEZIER_OPEN + '0.165, 0.840, 0.440, 1.000' + CUBIC_BEZIER_CLOSE,
+				easeOutQuint:   CUBIC_BEZIER_OPEN + '0.230, 1.000, 0.320, 1.000' + CUBIC_BEZIER_CLOSE,
+				easeOutSine:    CUBIC_BEZIER_OPEN + '0.390, 0.575, 0.565, 1.000' + CUBIC_BEZIER_CLOSE,
+				easeOutExpo:    CUBIC_BEZIER_OPEN + '0.190, 1.000, 0.220, 1.000' + CUBIC_BEZIER_CLOSE,
+				easeOutCirc:    CUBIC_BEZIER_OPEN + '0.075, 0.820, 0.165, 1.000' + CUBIC_BEZIER_CLOSE,
+				easeOutBack:    CUBIC_BEZIER_OPEN + '0.175, 0.885, 0.320, 1.275' + CUBIC_BEZIER_CLOSE,
+				easeInOutQuad:  CUBIC_BEZIER_OPEN + '0.455, 0.030, 0.515, 0.955' + CUBIC_BEZIER_CLOSE,
+				easeInOutCubic: CUBIC_BEZIER_OPEN + '0.645, 0.045, 0.355, 1.000' + CUBIC_BEZIER_CLOSE,
+				easeInOutQuart: CUBIC_BEZIER_OPEN + '0.770, 0.000, 0.175, 1.000' + CUBIC_BEZIER_CLOSE,
+				easeInOutQuint: CUBIC_BEZIER_OPEN + '0.860, 0.000, 0.070, 1.000' + CUBIC_BEZIER_CLOSE,
+				easeInOutSine:  CUBIC_BEZIER_OPEN + '0.445, 0.050, 0.550, 0.950' + CUBIC_BEZIER_CLOSE,
+				easeInOutExpo:  CUBIC_BEZIER_OPEN + '1.000, 0.000, 0.000, 1.000' + CUBIC_BEZIER_CLOSE,
+				easeInOutCirc:  CUBIC_BEZIER_OPEN + '0.785, 0.135, 0.150, 0.860' + CUBIC_BEZIER_CLOSE,
+				easeInOutBack:  CUBIC_BEZIER_OPEN + '0.680, -0.550, 0.265, 1.550' + CUBIC_BEZIER_CLOSE
+			},
 
 		originalAnimatedFilter = null,
 		pluginDisabledDefault = false;
@@ -377,7 +408,7 @@ Changelog:
 				td = cssPrefixes[i] + 'transition-duration',
 				tf = cssPrefixes[i] + 'transition-timing-function';
 
-			property = (transform ? cssPrefixes[i] + 'transform' : property);
+			var cssProperty = (transform ? cssPrefixes[i] + 'transform' : property);
 
 			if (saveOriginal) {
 				original[tp] = e.css(tp) || '';
@@ -385,9 +416,9 @@ Changelog:
 				original[tf] = e.css(tf) || '';
 			}
 
-			secondary[property] = transform ? _getTranslation(meta.left, meta.top, use3D) : value;
+			secondary[cssProperty] = transform ? _getTranslation(property === 'left' ? meta.left : -meta.right, property === 'top' ? meta.top : -meta.bottom, use3D) : value;
 
-			properties[tp] = (properties[tp] ? properties[tp] + ',' : '') + property;
+			properties[tp] = (properties[tp] ? properties[tp] + ',' : '') + cssProperty;
 			properties[td] = (properties[td] ? properties[td] + ',' : '') + duration + 'ms';
 			properties[tf] = (properties[tf] ? properties[tf] + ',' : '') + easing;
 		}
@@ -451,6 +482,17 @@ Changelog:
 		var is = jQuery.inArray(prop, cssTransitionProperties) > -1;
 		if ((prop == 'width' || prop == 'height') && (value === parseFloat(element.css(prop)))) is = false;
 		return is;
+	}
+	
+	/**
+		@private
+		@name _appropriateEasing
+		@function
+		@description Function to check if easing should be handled by plugin
+		@param {string} [easing]
+	 */
+	function _appropriateEasing(easing, element) {
+		return easing in easings;
 	}
 
 
@@ -528,7 +570,7 @@ Changelog:
 	*/
 	jQuery.fn.animate = function(prop, speed, easing, callback) {
 		prop = prop || {};
-		var isTranslatable = !(typeof prop['bottom'] !== 'undefined' || typeof prop['right'] !== 'undefined'),
+		var isTranslatable = (typeof prop['top'] === 'undefined' || typeof prop['bottom'] === 'undefined') && (typeof prop['left'] === 'undefined' || typeof prop['right'] === 'undefined'),
 			optall = jQuery.speed(speed, easing, callback),
 			elements = this,
 			callbackQueue = 0,
@@ -581,39 +623,7 @@ Changelog:
 					// run the main callback function
 					propertyCallback.call(self);
 				},
-				easings = {
-					bounce: CUBIC_BEZIER_OPEN + '0.0, 0.35, .5, 1.3' + CUBIC_BEZIER_CLOSE,
-					linear: 'linear',
-					swing: 'ease-in-out',
-
-					// Penner equation approximations from Matthew Lein's Ceaser: http://matthewlein.com/ceaser/
-					easeInQuad:     CUBIC_BEZIER_OPEN + '0.550, 0.085, 0.680, 0.530' + CUBIC_BEZIER_CLOSE,
-					easeInCubic:    CUBIC_BEZIER_OPEN + '0.550, 0.055, 0.675, 0.190' + CUBIC_BEZIER_CLOSE,
-					easeInQuart:    CUBIC_BEZIER_OPEN + '0.895, 0.030, 0.685, 0.220' + CUBIC_BEZIER_CLOSE,
-					easeInQuint:    CUBIC_BEZIER_OPEN + '0.755, 0.050, 0.855, 0.060' + CUBIC_BEZIER_CLOSE,
-					easeInSine:     CUBIC_BEZIER_OPEN + '0.470, 0.000, 0.745, 0.715' + CUBIC_BEZIER_CLOSE,
-					easeInExpo:     CUBIC_BEZIER_OPEN + '0.950, 0.050, 0.795, 0.035' + CUBIC_BEZIER_CLOSE,
-					easeInCirc:     CUBIC_BEZIER_OPEN + '0.600, 0.040, 0.980, 0.335' + CUBIC_BEZIER_CLOSE,
-					easeInBack:     CUBIC_BEZIER_OPEN + '0.600, -0.280, 0.735, 0.045' + CUBIC_BEZIER_CLOSE,
-					easeOutQuad:    CUBIC_BEZIER_OPEN + '0.250, 0.460, 0.450, 0.940' + CUBIC_BEZIER_CLOSE,
-					easeOutCubic:   CUBIC_BEZIER_OPEN + '0.215, 0.610, 0.355, 1.000' + CUBIC_BEZIER_CLOSE,
-					easeOutQuart:   CUBIC_BEZIER_OPEN + '0.165, 0.840, 0.440, 1.000' + CUBIC_BEZIER_CLOSE,
-					easeOutQuint:   CUBIC_BEZIER_OPEN + '0.230, 1.000, 0.320, 1.000' + CUBIC_BEZIER_CLOSE,
-					easeOutSine:    CUBIC_BEZIER_OPEN + '0.390, 0.575, 0.565, 1.000' + CUBIC_BEZIER_CLOSE,
-					easeOutExpo:    CUBIC_BEZIER_OPEN + '0.190, 1.000, 0.220, 1.000' + CUBIC_BEZIER_CLOSE,
-					easeOutCirc:    CUBIC_BEZIER_OPEN + '0.075, 0.820, 0.165, 1.000' + CUBIC_BEZIER_CLOSE,
-					easeOutBack:    CUBIC_BEZIER_OPEN + '0.175, 0.885, 0.320, 1.275' + CUBIC_BEZIER_CLOSE,
-					easeInOutQuad:  CUBIC_BEZIER_OPEN + '0.455, 0.030, 0.515, 0.955' + CUBIC_BEZIER_CLOSE,
-					easeInOutCubic: CUBIC_BEZIER_OPEN + '0.645, 0.045, 0.355, 1.000' + CUBIC_BEZIER_CLOSE,
-					easeInOutQuart: CUBIC_BEZIER_OPEN + '0.770, 0.000, 0.175, 1.000' + CUBIC_BEZIER_CLOSE,
-					easeInOutQuint: CUBIC_BEZIER_OPEN + '0.860, 0.000, 0.070, 1.000' + CUBIC_BEZIER_CLOSE,
-					easeInOutSine:  CUBIC_BEZIER_OPEN + '0.445, 0.050, 0.550, 0.950' + CUBIC_BEZIER_CLOSE,
-					easeInOutExpo:  CUBIC_BEZIER_OPEN + '1.000, 0.000, 0.000, 1.000' + CUBIC_BEZIER_CLOSE,
-					easeInOutCirc:  CUBIC_BEZIER_OPEN + '0.785, 0.135, 0.150, 0.860' + CUBIC_BEZIER_CLOSE,
-					easeInOutBack:  CUBIC_BEZIER_OPEN + '0.680, -0.550, 0.265, 1.550' + CUBIC_BEZIER_CLOSE
-				},
-				domProperties = {},
-				cssEasing = easings[opt.easing || 'swing'] ? easings[opt.easing || 'swing'] : opt.easing || 'swing';
+				domProperties = {};
 
 			// seperate out the properties for the relevant animation functions
 			for (var p in prop) {
@@ -621,12 +631,17 @@ Changelog:
 					var isDirection = jQuery.inArray(p, directions) > -1,
 						cleanVal = _interpretValue(self, prop[p], p, (isDirection && prop.avoidTransforms !== true));
 
-					if (prop.avoidTransforms !== true && _appropriateProperty(p, cleanVal, self)) {
+					// converts marginLeft to margin-left, etc...
+					var cssP = p.replace(/([A-Z])/g, function(s, group1) {
+					    return '-' + group1.toLowerCase();
+					});
+					
+					if (prop.avoidTransforms !== true && _appropriateProperty(cssP, cleanVal, self) && _appropriateEasing(opt.easing || 'swing')) {
 						_applyCSSTransition(
 							self,
-							p,
+							cssP,
 							opt.duration,
-							cssEasing,
+							easings[opt.easing || 'swing'] ? easings[opt.easing || 'swing'] : opt.easing || 'swing',
 							isDirection && prop.avoidTransforms === true ? cleanVal + 'px' : cleanVal,
 							isDirection && prop.avoidTransforms !== true,
 							isTranslatable,
@@ -708,10 +723,12 @@ Changelog:
 					// grab end state properties
 					restore = selfCSSData.secondary;
 
-					if (!leaveTransforms && typeof selfCSSData.meta['left_o'] !== undefined || typeof selfCSSData.meta['top_o'] !== undefined) {
-						restore['left'] = typeof selfCSSData.meta['left_o'] !== undefined ? selfCSSData.meta['left_o'] : 'auto';
-						restore['top'] = typeof selfCSSData.meta['top_o'] !== undefined ? selfCSSData.meta['top_o'] : 'auto';
-
+					if (!leaveTransforms && typeof selfCSSData.meta['left_o'] !== undefined || typeof selfCSSData.meta['right_o'] !== undefined || typeof selfCSSData.meta['top_o'] !== undefined || typeof selfCSSData.meta['bottom_o'] !== undefined) {
+						restore['left']   = typeof selfCSSData.meta['left_o']   !== undefined ? selfCSSData.meta['left_o']   : 'auto';
+						restore['right']  = typeof selfCSSData.meta['right_o']  !== undefined ? selfCSSData.meta['right_o']  : 'auto';
+						restore['top']    = typeof selfCSSData.meta['top_o']    !== undefined ? selfCSSData.meta['top_o']    : 'auto';
+						restore['bottom'] = typeof selfCSSData.meta['bottom_o'] !== undefined ? selfCSSData.meta['bottom_o'] : 'auto';
+						
 						// remove the transformations
 						for (i = cssPrefixes.length - 1; i >= 0; i--) {
 							restore[cssPrefixes[i]+'transform'] = '';
@@ -726,13 +743,20 @@ Changelog:
 								prop = prop.replace(rupper, '-$1').toLowerCase();
 								restore[prop] = cStyle.getPropertyValue(prop);
 
-								// is this a matrix property? extract left and top and apply
+								// is this a matrix property? extract left/right/top/bottom and apply
 								if (!leaveTransforms && (/matrix/i).test(restore[prop])) {
 									var explodedMatrix = restore[prop].replace(/^matrix\(/i, '').split(/, |\)$/g);
+									
+									var left   = self.css('left'),
+										right  = self.css('right'),
+										top    = self.css('top'),
+										bottom = self.css('bottom');
 
-									// apply the explicit left/top props
-									restore['left'] = (parseFloat(explodedMatrix[4]) + parseFloat(self.css('left')) + 'px') || 'auto';
-									restore['top'] = (parseFloat(explodedMatrix[5]) + parseFloat(self.css('top')) + 'px') || 'auto';
+									// apply the explicit left/right/top/bottom props
+									restore['left']   = left   === 'auto' ? 'auto' : ( parseFloat(explodedMatrix[4]) + parseFloat(self.css('left')))   + 'px';
+									restore['right']  = right  === 'auto' ? 'auto' : (-parseFloat(explodedMatrix[4]) + parseFloat(self.css('right')))  + 'px';
+									restore['top']    = top    === 'auto' ? 'auto' : ( parseFloat(explodedMatrix[5]) + parseFloat(self.css('top')))    + 'px';
+									restore['bottom'] = bottom === 'auto' ? 'auto' : (-parseFloat(explodedMatrix[5]) + parseFloat(self.css('bottom'))) + 'px';
 
 									// remove the transformations
 									for (i = cssPrefixes.length - 1; i >= 0; i--) {
