@@ -361,10 +361,8 @@ Changelog:
 			enhanceData.meta = meta;
 
 			// fix 0 issue (transition by 0 = nothing)
-			if (isTranslatable && offsetPosition === 0) {
-				offsetPosition = 0 - meta[stashedProperty];
-				meta[property] = offsetPosition;
-				meta[stashedProperty] = 0;
+			if (Math.abs(offsetPosition) < 1) {
+				offsetPosition = 0;
 			}
 		}
 
