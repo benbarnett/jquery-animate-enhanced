@@ -603,7 +603,9 @@ Changelog:
 						}
 						if (isTranslatable && typeof selfCSSData.meta !== 'undefined') {
 							for (var j = 0, dir; (dir = directions[j]); ++j) {
-								restore[dir] = (selfCSSData.meta[dir + '_o'] || 0) + 'px';
+								if(dir + '_o' in selfCSSData.meta) {
+									restore[dir] = selfCSSData.meta[dir + '_o'] + 'px';
+								}
 							}
 						}
 					}
@@ -753,10 +755,10 @@ Changelog:
 										bottom = self.css('bottom');
 
 									// apply the explicit left/right/top/bottom props
-									restore['left']   = left   === 'auto' ? 'auto' : ( parseFloat(explodedMatrix[4]) + parseFloat(self.css('left')))   + 'px';
-									restore['right']  = right  === 'auto' ? 'auto' : (-parseFloat(explodedMatrix[4]) + parseFloat(self.css('right')))  + 'px';
-									restore['top']    = top    === 'auto' ? 'auto' : ( parseFloat(explodedMatrix[5]) + parseFloat(self.css('top')))    + 'px';
-									restore['bottom'] = bottom === 'auto' ? 'auto' : (-parseFloat(explodedMatrix[5]) + parseFloat(self.css('bottom'))) + 'px';
+									restore['left']   = left   === 'auto' ? 'auto' : ( parseFloat(explodedMatrix[4]) + parseFloat(left))   + 'px';
+									restore['right']  = right  === 'auto' ? 'auto' : (-parseFloat(explodedMatrix[4]) + parseFloat(right))  + 'px';
+									restore['top']    = top    === 'auto' ? 'auto' : ( parseFloat(explodedMatrix[5]) + parseFloat(top))    + 'px';
+									restore['bottom'] = bottom === 'auto' ? 'auto' : (-parseFloat(explodedMatrix[5]) + parseFloat(bottom)) + 'px';
 
 									// remove the transformations
 									for (i = cssPrefixes.length - 1; i >= 0; i--) {
