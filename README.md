@@ -77,6 +77,10 @@ Since v0.77, the plugin will now automatically use 3D Translations where support
 Changelog
 -----------------
 
+0.91 (2/4/2012):
+
+* Merge Pull Request #74 - Unit Management
+
 0.90 (7/3/2012):
 
 * Adding public $.toggleDisabledByDefault() feature to disable entire plugin by default (Issue #73)

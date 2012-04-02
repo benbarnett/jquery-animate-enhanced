@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.90
+jquery.animate-enhanced plugin v0.91
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	0.91 (2/4/2012):
+		- Merge Pull Request #74 - Unit Management
+
 	0.90 (7/3/2012):
 		- Adding public $.toggleDisabledByDefault() feature to disable entire plugin by default (Issue #73)
 
