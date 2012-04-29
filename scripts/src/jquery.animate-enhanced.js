@@ -282,21 +282,22 @@ Changelog:
 		if (prop == 'bottom') cleanStart = parseInt(cleanCSSStart, 10) + translation.y;
 
 		// deal with shortcuts
-		if (!parts && val == 'show') {
-			cleanStart = 1;
+		if(!parts) {
+			if(val === 'show') {
+				// set the css opacity as the start value
+				cleanStart = 1 * e.css('opacity');
 			if (hidden) e.css({'display':'block', 'opacity': 0});
-		} else if (!parts && val == "hide") {
-			cleanStart = 0;
-		}
-
-		if (parts) {
+			} else if (!parts && val == "hide") {
+				cleanStart = 0;
+			}
+			
+			return cleanStart;
+		} else {
 			var end = parseFloat(parts[2]);
 
 			// If a +=/-= token was provided, we're doing a relative animation
 			if (parts[1]) end = ((parts[1] === '-=' ? -1 : 1) * end) + parseInt(cleanStart, 10);
 			return end;
-		} else {
-			return cleanStart;
 		}
 	}
 
