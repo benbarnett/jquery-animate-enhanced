@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	0.93 (6/8/2012):
+		- Adding other Opera 'transitionend' event (re: issue #90)
+
 	0.92 (6/8/2012):
 		- Seperate unbinds into different threads (re: issue #91)
 
@@ -227,7 +230,7 @@ Changelog:
 	// ----------
 	var thisBody = document.body || document.documentElement,
 		thisStyle = thisBody.style,
-		transitionEndEvent = (thisStyle.WebkitTransition !== undefined) ? 'webkitTransitionEnd' : (thisStyle.OTransition !== undefined) ? 'oTransitionEnd' : 'transitionend',
+		transitionEndEvent = (thisStyle.WebkitTransition !== undefined) ? 'webkitTransitionEnd' : (thisStyle.OTransition !== undefined) ? 'oTransitionEnd transitionend' : 'transitionend',
 		cssTransitionsSupported = thisStyle.WebkitTransition !== undefined || thisStyle.MozTransition !== undefined || thisStyle.OTransition !== undefined || thisStyle.transition !== undefined,
 		has3D = ('WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix()),
 		use3DByDefault = has3D;

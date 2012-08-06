@@ -77,6 +77,10 @@ Since v0.77, the plugin will now automatically use 3D Translations where support
 Changelog
 -----------------
 
+0.93 (6/8/2012):
+
+* Adding other Opera 'transitionend' event (re: issue #90)
+
 0.92 (6/8/2012):
 
 * Seperate unbinds into different threads (re: issue #91)
