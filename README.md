@@ -77,6 +77,10 @@ Since v0.77, the plugin will now automatically use 3D Translations where support
 Changelog
 -----------------
 
+0.92 (6/8/2012):
+
+* Seperate unbinds into different threads (re: issue #91)
+
 0.91 (2/4/2012):
 
 * Merge Pull Request #74 - Unit Management
