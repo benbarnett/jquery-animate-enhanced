@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.91
+jquery.animate-enhanced plugin v0.92
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	0.92 (6/8/2012):
+		- Seperate unbinds into different threads (re: issue #91)
+
 	0.91 (2/4/2012):
 		- Merge Pull Request #74 - Unit Management
 
@@ -761,9 +764,10 @@ Changelog:
 					}
 				}
 
-				// remove transition timing functions
+				// Remove transition timing functions
+				// Moving to seperate thread (re: Animation reverts when finished in Android - issue #91)
+				self.unbind(transitionEndEvent);
 				self.
-					unbind(transitionEndEvent).
 					css(selfCSSData.original).
 					css(restore).
 					data(DATA_KEY, null);
