@@ -653,7 +653,7 @@ Changelog:
 
 					// converts marginLeft to margin-left, etc...
 					var cssP = p.replace(/([A-Z])/g, function(s, group1) {
-						return '-' + group1.toLowerCase();
+					    return '-' + group1.toLowerCase();
 					});
 					
 					if (prop.avoidTransforms !== true && _appropriateProperty(cssP, cleanVal, self) && _appropriateEasing(opt.easing || 'swing')) {
@@ -766,6 +766,7 @@ Changelog:
 								// is this a matrix property? extract left/right/top/bottom and apply
 								if (!leaveTransforms && (/matrix/i).test(restore[prop])) {
 									var explodedMatrix = restore[prop].replace(/^matrix\(/i, '').split(/, |\)$/g);
+
 									
 									var left   = self.css('left'),
 										right  = self.css('right'),
