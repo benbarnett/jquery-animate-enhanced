@@ -3,7 +3,7 @@ jquery.animate-enhanced plugin
 
 Extend $.animate() to detect CSS transitions for Webkit, Mozilla and Opera and convert animations automatically. Compatible with IE6+
 
-Tested with jQuery 1.3.2 to 1.6.1
+Tested with jQuery 1.3.2 to 1.8.0
 
 Properties supported: (more to come)
 -----------------
