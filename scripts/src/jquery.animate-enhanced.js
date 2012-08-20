@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.96
+jquery.animate-enhanced plugin v0.96a
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	0.96a (20/08/2012):
+		- Checking event is from dispatch target (issue #58)
+
 	0.96 (20/08/2012):
 		- Fixes for context, all elements returned as context (issue #84)
 		- Reset position with leaveTransforms !== true fixes (issue #93)
@@ -584,9 +587,12 @@ Changelog:
 		return this[ optall.queue === true ? 'queue' : 'each' ](function() {
 			var self = jQuery(this),
 				opt = jQuery.extend({}, optall),
-				cssCallback = function() {
+				cssCallback = function(e) {
 					var selfCSSData = self.data(DATA_KEY) || { original: {} },
 						restore = {};
+
+					if (e.eventPhase != 2)  // not at dispatching target (thanks @warappa issue #58)
+						return;
 
 					// convert translations to left & top for layout
 					if (prop.leaveTransforms !== true) {

@@ -77,6 +77,10 @@ Since v0.77, the plugin will now automatically use 3D Translations where support
 Changelog
 -----------------
 
+0.96a (20/08/2012):
+
+* Checking event is from dispatch target (issue #58)
+
 0.96 (20/08/2012):
 
 * Fixes for context, all elements returned as context (issue #84)
