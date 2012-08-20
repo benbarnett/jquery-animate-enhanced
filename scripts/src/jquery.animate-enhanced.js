@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.94
+jquery.animate-enhanced plugin v0.95
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	0.95 (20/08/2012):
+		- If target opacity == current opacity, pass back to jquery native to get callback firing (#94)
+
 	0.94 (20/08/2012):
 		- Addresses Firefox callback mechanisms (issue #94)
 		- using $.one() to bind to CSS callbacks in a more generic way
@@ -476,7 +479,7 @@ Changelog:
 	*/
 	function _appropriateProperty(prop, value, element) {
 		var is = jQuery.inArray(prop, cssTransitionProperties) > -1;
-		if ((prop == 'width' || prop == 'height') && (value === parseFloat(element.css(prop)))) is = false;
+		if ((prop == 'width' || prop == 'height' || prop == 'opacity') && (parseFloat(value) === parseFloat(element.css(prop)))) is = false;
 		return is;
 	}
 
