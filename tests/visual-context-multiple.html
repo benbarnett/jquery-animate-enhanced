@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>jQuery Animations with automatic CSS3 transitions when possible</title>
+	<meta name="generator" content="TextMate http://macromates.com/">
+	<meta name="author" content="Ben Barnett">
+	<!-- Date: 2010-09-01 -->
+	
+	<style type="text/css" media="screen">
+		html {
+			padding:0;
+			margin:0;
+			background:#ebebeb;
+		}
+		
+		body {
+			width:760px;
+			padding:15px;
+			margin:15px auto;
+			background:#fff;
+			font: 75% "Lucida Grande", "Trebuchet MS", Verdana, sans-serif;
+			-webkit-border-radius:10px;
+			-moz-border-radius:10px;
+			border-radius:10px;
+		}
+		
+		pre {
+			margin:0;
+			padding:15px;
+			background:#666;
+			color:#fff;
+			font-size:120%;
+			width:730px;
+			overflow:auto;
+		}
+		
+		h2.highlight {
+			padding:5px;
+			background:#ffcc00;
+		}
+		
+		.target, .notarget {
+			padding:5px 20px;
+			width:250px;
+			background:#0c0;
+			margin:20px 0;
+			position:relative;
+			font-size:80%;
+			top:20px;
+		}
+		
+		.target b, .notarget b {
+			background:#ff0;
+			color:#333;
+			font-size:120%;
+		}
+		
+		.notarget {
+			background:#0cc;
+		}
+		
+		.target.on {
+			background:#c00;
+		}
+
+		p#results {
+			color:#c00;
+		}
+
+		div#socialise {
+			margin-top:50px;
+			padding-top:20px;
+			border-top:1px solid #ccc;
+		}
+
+		img {
+			width:200px;
+			height:200px;
+		}
+	</style>
+</head>
+<body>
+	<h1>jquery.animate-enhanced plugin test</h1>
+	<h2>Test: Context for multiple elements</h2>
+
+	<h2>Demo</h2>
+	<div class="target">Area 1</div>
+	<div class="target">Area 2</div>
+	<div class="target">Area 3</div>
+
+	
+	<button id="start">Run test</button>
+	
+	
+	<script type="text/javascript" src="../scripts/contrib/jquery-1.8.0.js"></script>
+	<script type="text/javascript" src="../scripts/src/jquery.animate-enhanced.js"></script>
+	<script type="text/javascript" charset="utf-8">
+		$('button#start').click(function() {
+			button = $(this).attr('disabled', 'disabled');
+			$('.target').animate({left: '+=100px'}, 500, function() {
+				console.log('Callback fired', this);
+				$(this).addClass('on');
+			});
+		});
+		
+	</script>
+
+</body>
+</html>

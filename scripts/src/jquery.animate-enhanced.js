@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.95
+jquery.animate-enhanced plugin v0.96
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,11 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	0.96 (20/08/2012):
+		- Fixes for context, all elements returned as context (issue #84)
+		- Reset position with leaveTransforms !== true fixes (issue #93)
+		
+
 	0.95 (20/08/2012):
 		- If target opacity == current opacity, pass back to jquery native to get callback firing (#94)
 
@@ -464,8 +469,7 @@ Changelog:
 		@param {variant} [val]
 	*/
 	function _cleanValue(val) {
-		valUnit = _getUnit(val);
-		return parseFloat(val.replace(/px/i, ''));
+		return parseFloat(val.replace(_getUnit(val), ''));
 	}
 
 
@@ -567,7 +571,7 @@ Changelog:
 				if (callbackQueue === 0) {
 					// we're done, trigger the user callback
 					if (typeof optall.complete === 'function') {
-						optall.complete.apply(elements[0], arguments);
+						optall.complete.apply(elements, arguments);
 					}
 				}
 			},
@@ -592,6 +596,8 @@ Changelog:
 						if (isTranslatable && typeof selfCSSData.meta !== 'undefined') {
 							for (var j = 0, dir; (dir = directions[j]); ++j) {
 								restore[dir] = selfCSSData.meta[dir + '_o'] + valUnit;
+								console.log($(this).css(dir), restore[dir]);
+								$(this).css(dir, restore[dir]);
 							}
 						}
 					}
@@ -609,7 +615,7 @@ Changelog:
 					}
 
 					// run the main callback function
-					propertyCallback.call(self);
+					propertyCallback.call(this);
 				},
 				easings = {
 					bounce: CUBIC_BEZIER_OPEN + '0.0, 0.35, .5, 1.3' + CUBIC_BEZIER_CLOSE,
