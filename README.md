@@ -77,6 +77,11 @@ Since v0.77, the plugin will now automatically use 3D Translations where support
 Changelog
 -----------------
 
+0.94 (20/08/2012):
+
+* Addresses Firefox callback mechanisms (issue #94)
+* using $.one() to bind to CSS callbacks in a more generic way
+
 0.93 (6/8/2012):
 
 * Adding other Opera 'transitionend' event (re: issue #90)

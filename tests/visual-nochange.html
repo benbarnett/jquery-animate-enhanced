@@ -74,11 +74,15 @@
 			width:200px;
 			height:200px;
 		}
+
+		img#test {
+			opacity:1;
+		}
 	</style>
 </head>
 <body>
 	<h1>jquery.animate-enhanced plugin test</h1>
-	<h2>Test: Context for callback</h2>
+	<h2>Test: Callback on no animation</h2>
 
 	<h2>Demo</h2>
 	<div class="target">
@@ -99,7 +103,7 @@
 				});
 			});
 			
-			$('img#test').animate({left: '300px'}, 500, function() {
+			$('img#test').animate({opacity: 1}, 500, function() {
 				console.log('Callback fired');
 			    this.src = 'http://29.media.tumblr.com/tumblr_lg4espXhQS1qb58fro1_400.jpg';
 			});

@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.92
+jquery.animate-enhanced plugin v0.94
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,10 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	0.94 (20/08/2012):
+		- Addresses Firefox callback mechanisms (issue #94)
+		- using $.one() to bind to CSS callbacks in a more generic way
+
 	0.93 (6/8/2012):
 		- Adding other Opera 'transitionend' event (re: issue #90)
 
@@ -202,7 +206,7 @@ Changelog:
 	// ----------
 	var	cssTransitionProperties = ['top', 'right', 'bottom', 'left', 'opacity', 'height', 'width'],
 		directions = ['top', 'right', 'bottom', 'left'],
-		cssPrefixes = ['', '-webkit-', '-moz-', '-o-'],
+		cssPrefixes = ['-webkit-', '-moz-', '-o-', ''],
 		pluginOptions = ['avoidTransforms', 'useTranslate3d', 'leaveTransforms'],
 		rfxnum = /^([+-]=)?([\d+-.]+)(.*)$/,
 		rupper = /([A-Z])/g,
@@ -230,7 +234,7 @@ Changelog:
 	// ----------
 	var thisBody = document.body || document.documentElement,
 		thisStyle = thisBody.style,
-		transitionEndEvent = (thisStyle.WebkitTransition !== undefined) ? 'webkitTransitionEnd' : (thisStyle.OTransition !== undefined) ? 'oTransitionEnd transitionend' : 'transitionend',
+		transitionEndEvent = 'webkitTransitionEnd oTransitionEnd transitionend',
 		cssTransitionsSupported = thisStyle.WebkitTransition !== undefined || thisStyle.MozTransition !== undefined || thisStyle.OTransition !== undefined || thisStyle.transition !== undefined,
 		has3D = ('WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix()),
 		use3DByDefault = has3D;
@@ -676,7 +680,7 @@ Changelog:
 
 				// has to be done in a timeout to ensure transition properties are set
 				setTimeout(function() {
-					self.bind(transitionEndEvent, cssCallback).css(secondary);
+					self.one(transitionEndEvent, cssCallback).css(secondary);
 				});
 			}
 			else {
