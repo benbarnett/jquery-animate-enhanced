@@ -596,8 +596,7 @@ Changelog:
 						if (isTranslatable && typeof selfCSSData.meta !== 'undefined') {
 							for (var j = 0, dir; (dir = directions[j]); ++j) {
 								restore[dir] = selfCSSData.meta[dir + '_o'] + valUnit;
-								console.log($(this).css(dir), restore[dir]);
-								$(this).css(dir, restore[dir]);
+								jQuery(this).css(dir, restore[dir]);
 							}
 						}
 					}
