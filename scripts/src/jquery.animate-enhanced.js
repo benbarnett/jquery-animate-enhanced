@@ -218,7 +218,7 @@ Changelog:
 	var	cssTransitionProperties = ['top', 'right', 'bottom', 'left', 'opacity', 'height', 'width'],
 		directions = ['top', 'right', 'bottom', 'left'],
 		cssPrefixes = ['-webkit-', '-moz-', '-o-', ''],
-		pluginOptions = ['avoidTransforms', 'useTranslate3d', 'leaveTransforms'],
+		pluginOptions = ['avoidTransforms', 'useTranslate3d', 'leaveTransforms', 'usePercentage'],
 		rfxnum = /^([+-]=)?([\d+-.]+)(.*)$/,
 		rupper = /([A-Z])/g,
 		defaultEnhanceData = {
@@ -330,8 +330,9 @@ Changelog:
 		@param {integer} [y]
 		@param {boolean} [use3D] Use translate3d if available?
 	*/
-	function _getTranslation(x, y, use3D) {
-		return ((use3D === true || (use3DByDefault === true && use3D !== false)) && has3D) ? 'translate3d(' + x + 'px, ' + y + 'px, 0)' : 'translate(' + x + 'px,' + y + 'px)';
+	function _getTranslation(x, y, use3D, usePercentage) {
+		var unit = (usePercentage ? '%' : 'px');
+		return ((use3D === true || (use3DByDefault === true && use3D !== false)) && has3D) ? 'translate3d(' + x + unit + ', ' + y + unit + ', 0)' : 'translate(' + x + unit + ', ' + y + unit + ')';
 	}
 
 
@@ -349,7 +350,7 @@ Changelog:
 		@param {boolean} [isTranslatable] Is this a CSS translation?
 		@param {boolean} [use3D] Use translate3d if available?
 	*/
-	function _applyCSSTransition(e, property, duration, easing, value, isTransform, isTranslatable, use3D) {
+	function _applyCSSTransition(e, property, duration, easing, value, isTransform, isTranslatable, use3D, usePercentage) {
 		var eCSSData = e.data(DATA_KEY),
 			enhanceData = eCSSData && !_isEmptyObject(eCSSData) ? eCSSData : jQuery.extend(true, {}, defaultEnhanceData),
 			offsetPosition = value,
@@ -375,7 +376,7 @@ Changelog:
 		}
 
 		// reapply data and return
-		return e.data(DATA_KEY, _applyCSSWithPrefix(e, enhanceData, property, duration, easing, offsetPosition, isTransform, isTranslatable, use3D));
+		return e.data(DATA_KEY, _applyCSSWithPrefix(e, enhanceData, property, duration, easing, offsetPosition, isTransform, isTranslatable, use3D, usePercentage));
 	}
 
 	/**
@@ -392,7 +393,7 @@ Changelog:
 		@param {boolean} [isTranslatable] Is this a CSS translation?
 		@param {boolean} [use3D] Use translate3d if available?
 	*/
-	function _applyCSSWithPrefix(e, cssProperties, property, duration, easing, value, isTransform, isTranslatable, use3D) {
+	function _applyCSSWithPrefix(e, cssProperties, property, duration, easing, value, isTransform, isTranslatable, use3D, usePercentage) {
 		var saveOriginal = false,
 			transform = isTransform === true && isTranslatable === true;
 
@@ -422,7 +423,7 @@ Changelog:
 				original[tf] = e.css(tf) || '';
 			}
 
-			secondary[property] = transform ? _getTranslation(meta.left, meta.top, use3D) : value;
+			secondary[property] = transform ? _getTranslation(meta.left, meta.top, use3D, usePercentage) : value;
 
 			properties[tp] = (properties[tp] ? properties[tp] + ',' : '') + property;
 			properties[td] = (properties[td] ? properties[td] + ',' : '') + duration + 'ms';
@@ -671,7 +672,8 @@ Changelog:
 							isDirection && prop.avoidTransforms === true ? cleanVal + valUnit : cleanVal,
 							isDirection && prop.avoidTransforms !== true,
 							isTranslatable,
-							prop.useTranslate3d === true);
+							prop.useTranslate3d === true,
+							prop.usePercentage === true);
 
 					}
 					else {
