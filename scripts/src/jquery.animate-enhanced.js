@@ -694,7 +694,7 @@ Changelog:
 
 				// has to be done in a timeout to ensure transition properties are set
 				setTimeout(function() {
-					self.one(transitionEndEvent, cssCallback).css(secondary);
+					self.bind(transitionEndEvent, cssCallback).css(secondary);
 				});
 			}
 			else {
