@@ -29,7 +29,7 @@ Simple animation demo and documentation found here: http://playground.benbarnett
 What it does
 -----------------
 
-The plugin will analyse the properties you're animating on, and select the most appropriate method for the browser in use. This means your transitions on left, top and opacity will convert to a CSS3 transition on Webkit & Mozilla agents that support it, and Opera 10.50+. If the user is on a browser that has no CSS3 transitions, this plugin knows about it and won't get involved. Silent degradation :)
+The plugin will analyse the properties you're animating on, and select the most appropriate method for the browser in use. This means your transitions on left, top and opacity will convert to a CSS3 transition on Webkit & Mozilla agents that support it, and Opera 10.50+. If the user is on a browser that has no CSS3 transitions, this plugin knows about it and won't get involved. Silent degradation.
 
 Multiple callback mechanisms are created internally to monitor for DOM manipulation and for all 'transitionend' CSS3 events to be picked up. This means you have one neat callback() for the whole animation regardless on whether the plugin is using CSS3, DOM, or both for its animations.
 
