@@ -77,6 +77,10 @@ Since v0.77, the plugin will now automatically use 3D Translations where support
 Changelog
 -----------------
 
+0.97 (6/11/2012):
+
+* Merging pull request #104 thx @gavrochelegnou - .bind instead of .one
+
 0.96a (20/08/2012):
 
 * Checking event is from dispatch target (issue #58)

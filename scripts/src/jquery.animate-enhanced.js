@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.96a
+jquery.animate-enhanced plugin v0.97
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	0.97 (6/11/2012):
+		- Merging pull request #104 thx @gavrochelegnou - .bind instead of .one
+
 	0.96a (20/08/2012):
 		- Checking event is from dispatch target (issue #58)
 
