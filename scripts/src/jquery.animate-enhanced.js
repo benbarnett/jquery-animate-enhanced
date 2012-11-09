@@ -291,6 +291,7 @@ Changelog:
 	function _interpretValue(e, val, prop, isTransform) {
 		// this is a nasty fix, but we check for prop == 'd' to see if we're dealing with SVG, and abort
 		if (prop == "d") return;
+		if (!_isValidElement(e)) return;
 		
 		var parts = rfxnum.exec(val),
 			start = e.css(prop) === 'auto' ? 0 : e.css(prop),
@@ -479,6 +480,15 @@ Changelog:
 	}
 
 
+	function _isValidElement(element) {
+		var allValid=true;
+		element.each(function(index, el) {
+			allValid = allValid && el.ownerDocument;
+			return allValid;
+		});
+		return allValid;
+	}
+
 	/**
 		@private
 		@name _appropriateProperty
@@ -488,6 +498,10 @@ Changelog:
 		@param {variant} [value]
 	*/
 	function _appropriateProperty(prop, value, element) {
+		if (!_isValidElement(element)) {
+			return false;
+		}
+
 		var is = jQuery.inArray(prop, cssTransitionProperties) > -1;
 		if ((prop == 'width' || prop == 'height' || prop == 'opacity') && (parseFloat(value) === parseFloat(element.css(prop)))) is = false;
 		return is;
