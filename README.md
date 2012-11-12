@@ -77,6 +77,10 @@ Since v0.77, the plugin will now automatically use 3D Translations where support
 Changelog
 -----------------
 
+0.98 (12/11/2012):
+
+* Merging pull request #106 thx @gboysko - checking for ownerDocument before using getComputedStyle
+
 0.97 (6/11/2012):
 
 * Merging pull request #104 thx @gavrochelegnou - .bind instead of .one

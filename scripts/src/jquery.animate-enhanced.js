@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.97
+jquery.animate-enhanced plugin v0.98
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	0.98 (12/11/2012):
+		- Merging pull request #106 thx @gboysko - checking for ownerDocument before using getComputedStyle
+
 	0.97 (6/11/2012):
 		- Merging pull request #104 thx @gavrochelegnou - .bind instead of .one
 
