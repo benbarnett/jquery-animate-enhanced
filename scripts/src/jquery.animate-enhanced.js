@@ -312,7 +312,7 @@ Changelog:
 		// deal with shortcuts
 		if (!parts && val == 'show') {
 			cleanStart = 1;
-			if (hidden) e.css({'display':'block', 'opacity': 0});
+			if (hidden) e.css({'display': (e.context.tagName == 'LI') ? 'list-item' : 'block', 'opacity': 0});
 		} else if (!parts && val == "hide") {
 			cleanStart = 0;
 		}
