@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.98
+jquery.animate-enhanced plugin v0.99
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	0.99 (5/12/2012):
+		- PR #109 Added support for list-item nodes. FadeIn on tags was omitting the list-style support. (thx @SeanCannon)
+		
 	0.98 (12/11/2012):
 		- Merging pull request #106 thx @gboysko - checking for ownerDocument before using getComputedStyle
 
