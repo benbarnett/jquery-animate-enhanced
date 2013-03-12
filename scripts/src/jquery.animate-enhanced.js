@@ -36,6 +36,14 @@ Targetted properties (for now):
 	- opacity
 	- width
 	- height
+	- paddingTop
+	- paddingBottom
+	- paddingLeft
+	- paddingRight
+	- marginTop
+	- marginBottom
+	- marginLeft
+	- marginRight
 
 Usage (exactly the same as it would be normally):
 
@@ -44,6 +52,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	0.991 (12/03/2013):
+		- Added padding and margin properties
+
 	0.99 (5/12/2012):
 		- PR #109 Added support for list-item nodes. FadeIn on tags was omitting the list-style support. (thx @SeanCannon)
 		
@@ -224,7 +235,7 @@ Changelog:
 	// ----------
 	// Plugin variables
 	// ----------
-	var	cssTransitionProperties = ['top', 'right', 'bottom', 'left', 'opacity', 'height', 'width'],
+	var	cssTransitionProperties = ['top', 'right', 'bottom', 'left', 'opacity', 'height', 'width', 'paddingTop', 'paddingBottom', 'paddingLeft', 'paddingRight', 'marginTop', 'marginBottom', 'marginLeft', 'marginRight'],
 		directions = ['top', 'right', 'bottom', 'left'],
 		cssPrefixes = ['-webkit-', '-moz-', '-o-', ''],
 		pluginOptions = ['avoidTransforms', 'useTranslate3d', 'leaveTransforms'],
@@ -283,6 +294,25 @@ Changelog:
 		return val.match(/\D+$/);
 	}
 
+	/**
+		@private
+		@name _convertProperty
+		@function
+		@description Convert jQuery CSS property to simple CSS property
+		@param {string} [cssJQueryProperty] jQuery CSS property
+	*/
+	function _convertProperty(property){
+		return {
+			"paddingBottom": "padding-bottom",
+			"paddingTop": "padding-top",
+			"paddingLeft": "padding-left",
+			"paddingRight": "padding-right",
+			"marginBottom": "margin-bottom",
+			"marginTop": "margin-top",
+			"marginLeft": "margin-left",
+			"marginRight": "margin-right"
+		}[property] || property;
+	}
 
 	/**
 		@private
@@ -424,7 +454,7 @@ Changelog:
 				td = cssPrefixes[i] + 'transition-duration',
 				tf = cssPrefixes[i] + 'transition-timing-function';
 
-			property = (transform ? cssPrefixes[i] + 'transform' : property);
+			property = (transform ? cssPrefixes[i] + 'transform' : _convertProperty(property));
 
 			if (saveOriginal) {
 				original[tp] = e.css(tp) || '';
@@ -509,7 +539,7 @@ Changelog:
 		}
 
 		var is = jQuery.inArray(prop, cssTransitionProperties) > -1;
-		if ((prop == 'width' || prop == 'height' || prop == 'opacity') && (parseFloat(value) === parseFloat(element.css(prop)))) is = false;
+		if ((prop == 'width' || prop == 'height' || prop == 'opacity' || prop == 'paddingTop' || prop == 'paddingBottom' || prop == 'paddingRight' || prop == 'paddingLeft') && (parseFloat(value) === parseFloat(element.css(prop)))) is = false;
 		return is;
 	}
 
