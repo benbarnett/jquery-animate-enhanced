@@ -528,12 +528,24 @@ Changelog:
 		
 		/**
 			@public
-			@name toggleEnabledByDefault
+			@name toggleDisabledByDefault
 			@function
 			@description Toggle the plugin to be disabled by default (can be overridden per animation with avoidCSSTransitions)
 		*/
 		toggleDisabledByDefault: function() {
 			return pluginDisabledDefault = !pluginDisabledDefault;
+		}
+	});
+
+
+	/**
+		@public
+		@name setDisabledByDefault
+		@function
+		@description Set or unset the 'disabled by default' value
+	*/
+	setDisabledByDefault: function(newValue) {
+			return pluginDisabledDefault = newValue;
 		}
 	});
 
