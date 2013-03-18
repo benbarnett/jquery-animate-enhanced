@@ -63,6 +63,9 @@ Returns new setting
 * $.toggleDisabledByDefault()
 Toggle the plugin to be disabled by default (can be overridden per animation with avoidCSSTransitions described above)
 Returns new setting
+* $.setDisabledByDefault(boolean)
+Set the plugin to be disabled by default based on the boolean passed.
+Returns new setting
 * $(e).translation()
 Returns current X and Y coordinates for (e) no matter how the element is being positioned
 Returns in the format { x: 0, y: 0 }
@@ -209,7 +212,7 @@ Changelog
 0.64 (27/01/2011):
 
 * BUGFIX #13: .slideUp(), .slideToggle(), .slideDown() bugfixes in Webkit
-        
+
 0.63 (12/01/2011):
 
 * BUGFIX #11: callbacks not firing when new value == old value
@@ -246,7 +249,7 @@ Changelog
 
 * New $.translate() method to easily calculate current transformed translation
 * Repeater callback bug fix for leaveTransforms:true (was constantly appending properties)
-	
+
 0.52 (16/11/2010):
 
 * leaveTransforms: true bug fixes
