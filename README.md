@@ -63,6 +63,9 @@ Returns new setting
 * $.toggleDisabledByDefault()
 Toggle the plugin to be disabled by default (can be overridden per animation with avoidCSSTransitions described above)
 Returns new setting
+* $.setDisabledByDefault()
+Toggle the plugin to be disabled by default (can be overridden per animation with avoidCSSTransitions described above)
+Returns new setting
 * $(e).translation()
 Returns current X and Y coordinates for (e) no matter how the element is being positioned
 Returns in the format { x: 0, y: 0 }
