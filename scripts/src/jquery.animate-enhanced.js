@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	0.99.1 (3/4/2013):
+		- Add Set or unset the 'disabled by default' value (PR #117)
+
 	0.99 (5/12/2012):
 		- PR #109 Added support for list-item nodes. FadeIn on tags was omitting the list-style support. (thx @SeanCannon)
 		
@@ -534,17 +537,16 @@ Changelog:
 		*/
 		toggleDisabledByDefault: function() {
 			return pluginDisabledDefault = !pluginDisabledDefault;
-		}
-	});
+		},
 
 
-	/**
-		@public
-		@name setDisabledByDefault
-		@function
-		@description Set or unset the 'disabled by default' value
-	*/
-	setDisabledByDefault: function(newValue) {
+		/**
+			@public
+			@name setDisabledByDefault
+			@function
+			@description Set or unset the 'disabled by default' value
+		*/
+		setDisabledByDefault: function(newValue) {
 			return pluginDisabledDefault = newValue;
 		}
 	});
