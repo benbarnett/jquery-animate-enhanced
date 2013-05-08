@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v1.0
+jquery.animate-enhanced plugin v1.01
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	1.01 (8/5/2013):
+		- Adding appropriate display value for wider range of elements (issue #121 - thanks smacky)
+
 	1.0 (8/5/2103):
 		- Fix avoidTransforms: true behaviour for directional transitions
 
@@ -321,7 +324,7 @@ Changelog:
 		// deal with shortcuts
 		if (!parts && val == 'show') {
 			cleanStart = 1;
-			if (hidden) e.css({'display': (e.context.tagName == 'LI') ? 'list-item' : 'block', 'opacity': 0});
+			if (hidden) e.css({'display': _domElementVisibleDisplayValue(e.context.tagName), 'opacity': 0});
 		} else if (!parts && val == "hide") {
 			cleanStart = 0;
 		}
@@ -480,6 +483,31 @@ Changelog:
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Fetch most appropriate display value for element types
+	 * @see  https://github.com/benbarnett/jQuery-Animate-Enhanced/issues/121
+	 * @private
+	 * @param  {[type]} tagName [description]
+	 * @return {[type]}         [description]
+	 */
+	function _domElementVisibleDisplayValue(tagName) {
+		tagName = tagName.toUpperCase();
+		var displayValues = {
+			'LI'       : 'list-item',
+			'TR'       : 'table-row',
+			'TD'       : 'table-cell',
+			'TH'       : 'table-cell',
+			'CAPTION'  : 'table-caption',
+			'COL'      : 'table-column',
+			'COLGROUP' : 'table-column-group',
+			'TFOOT'      : 'table-footer-group',
+			'THEAD'      : 'table-header-group',
+			'TBODY'      : 'table-row-group'
+		};
+
+		return typeof displayValues[tagName] == 'string' ? displayValues[tagName] : 'block';
 	}
 
 
