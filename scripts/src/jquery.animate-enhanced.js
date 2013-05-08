@@ -242,7 +242,6 @@ Changelog:
 				left : 0
 			}
 		},
-		valUnit = 'px',
 
 		DATA_KEY = 'jQe',
 		CUBIC_BEZIER_OPEN = 'cubic-bezier(',
@@ -302,13 +301,18 @@ Changelog:
 		if (prop == "d") return;
 		if (!_isValidElement(e)) return;
 		
-		var parts = rfxnum.exec(val),
-			start = e.css(prop) === 'auto' ? 0 : e.css(prop),
-			cleanCSSStart = typeof start == 'string' ? _cleanValue(start) : start,
-			cleanTarget = typeof val == 'string' ? _cleanValue(val) : val,
-			cleanStart = isTransform === true ? 0 : cleanCSSStart,
-			hidden = e.is(':hidden'),
-			translation = e.translation();
+    
+		var parts = rfxnum.exec(val);
+		var	start = e.css(prop) === 'auto' ? 0 : e.css(prop);
+    start = _breakdownValue(start);
+    var startUnit =  start.unit;
+    val = _breakdownValue(val);
+    var valUnit =  val.unit;
+    var	cleanCSSStart = typeof start == 'string' ? start.val: start;
+    var cleanTarget = typeof val == 'string' ? valUnit : val;
+    var cleanStart = isTransform === true ? 0 : cleanCSSStart;
+    var hidden = e.is(':hidden');
+    var translation = e.translation();
 
 		if (prop == 'left') cleanStart = parseInt(cleanCSSStart, 10) + translation.x;
 		if (prop == 'right') cleanStart = parseInt(cleanCSSStart, 10) + translation.x;
@@ -325,12 +329,14 @@ Changelog:
 
 		if (parts) {
 			var end = parseFloat(parts[2]);
-
+      var endUnit = parts[3] == "" ? "px" : parts[3];
 			// If a +=/-= token was provided, we're doing a relative animation
-			if (parts[1]) end = ((parts[1] === '-=' ? -1 : 1) * end) + parseInt(cleanStart, 10);
-			return end;
+			if (parts[1]){
+        end = ((parts[1] === '-=' ? -1 : 1) * end) + parseInt(cleanStart, 10);
+			}
+      return {val: end, unit: endUnit};
 		} else {
-			return cleanStart;
+			return {val: cleanStart, unit: startUnit} ;
 		}
 	}
 
@@ -344,7 +350,15 @@ Changelog:
 		@param {boolean} [use3D] Use translate3d if available?
 	*/
 	function _getTranslation(x, y, use3D) {
-		return ((use3D === true || (use3DByDefault === true && use3D !== false)) && has3D) ? 'translate3d(' + x + 'px, ' + y + 'px, 0)' : 'translate(' + x + 'px,' + y + 'px)';
+    if(has3D && 
+      ((use3D == true) || (use3DByDefault === true && use3D !== false)))
+     {
+        return 'translate3d(' + x + ', ' + y + ', 0)'  
+     }
+     else
+     {
+        return 'translate(' + x + ',' + y + ')';
+     }
 	}
 
 
@@ -370,21 +384,24 @@ Changelog:
 
 		if (isDirection) {
 			var meta = enhanceData.meta,
-				cleanPropertyValue = _cleanValue(e.css(property)) || 0,
 				stashedProperty = property + '_o';
+      
+      var cleanPropertyValue = _breakdownValue(e.css(property)).val || 0;
+      var rawOffsetPosition = (value.val - cleanPropertyValue); 
 
-			offsetPosition = value - cleanPropertyValue;
-
-			meta[property] = offsetPosition;
-			meta[stashedProperty] = e.css(property) == 'auto' ? 0 + offsetPosition : cleanPropertyValue + offsetPosition || 0;
+			meta[property] = offsetPosition.val;
+			meta[stashedProperty] = e.css(property) == 'auto' ? 0 + rawOffsetPosition : cleanPropertyValue + rawOffsetPosition || 0;
 			enhanceData.meta = meta;
 
 			// fix 0 issue (transition by 0 = nothing)
-			if (isTranslatable && offsetPosition === 0) {
-				offsetPosition = 0 - meta[stashedProperty];
-				meta[property] = offsetPosition;
+			if (isTranslatable && offsetPosition.val === 0) {
+				rawOffsetPosition = 0 - meta[stashedProperty];
+				meta[property] = rawOffsetPosition;
 				meta[stashedProperty] = 0;
 			}
+      
+      meta[property] = meta[property] + value.unit;
+      meta[stashedProperty] = meta[stashedProperty] + value.unit;
 		}
 
 		// reapply data and return
@@ -479,16 +496,30 @@ Changelog:
 
 	/**
 		@private
-		@name _cleanValue
+		@name _breakdownValue
 		@function
-		@description Remove 'px' and other artifacts
-		@param {variant} [val]
+		@description Object-ify value number and unit (ie. 'px', '%'). Assumes px if no unit given.
+		@param {string} [val]
 	*/
-	function _cleanValue(val) {
-		return parseFloat(val.replace(_getUnit(val), ''));
+	function _breakdownValue(val) {
+    try{
+      var unit = _getUnit(val);
+      val = parseFloat(val.replace(unit, ''));
+		} catch(e)
+    {
+      unit = "px";
+    }
+    
+    return {
+      unit: unit,
+      val: val
+    };
 	}
 
-
+  function _cleanValue(val){ 
+    return parseFloat(val.replace(_getUnit(val), ''));
+  }
+  
 	function _isValidElement(element) {
 		var allValid=true;
 		element.each(function(index, el) {
@@ -638,7 +669,7 @@ Changelog:
 						}
 						if (isTranslatable && typeof selfCSSData.meta !== 'undefined') {
 							for (var j = 0, dir; (dir = directions[j]); ++j) {
-								restore[dir] = selfCSSData.meta[dir + '_o'] + valUnit;
+								restore[dir] = selfCSSData.meta[dir + '_o'] + 'px';
 								jQuery(this).css(dir, restore[dir]);
 							}
 						}
@@ -699,13 +730,13 @@ Changelog:
 					var isDirection = jQuery.inArray(p, directions) > -1,
 						cleanVal = _interpretValue(self, prop[p], p, (isDirection && prop.avoidTransforms !== true));
 
-					if (prop.avoidTransforms !== true && _appropriateProperty(p, cleanVal, self)) {
+					if (prop.avoidTransforms !== true && _appropriateProperty(p, cleanVal.val+cleanVal.unit, self)) {
 						_applyCSSTransition(
 							self,
 							p,
 							opt.duration,
 							cssEasing,
-							isDirection && prop.avoidTransforms === true ? cleanVal + valUnit : cleanVal,
+							isDirection && prop.avoidTransforms === true ? cleanVal : cleanVal,
 							isDirection && prop.avoidTransforms !== true,
 							isTranslatable,
 							prop.useTranslate3d === true);
