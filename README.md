@@ -42,13 +42,16 @@ Usage
 
 Usage is identical to the jQuery animate() function, but it comes with 3 new paramaters, which are totally optional and safe to leave untouched for general use:
 
-* avoidTransforms: (Boolean)
+### avoidTransforms: (Boolean)
 By default the plugin will convert left and top animations to the CSS3 style -webkit-transform (or equivalent) to aid hardware acceleration. This functionality can be disabled by setting this to true.
-* useTranslate3d: (Boolean)
+
+### useTranslate3d: (Boolean)
 This will be auto-detected and set to true if the browser supports it. Set to true/false to force a specific mode. 3D is recommended for iPhone/iPad development ([here's why](http://www.benbarnett.net/2010/08/30/writing-html-and-css-for-mobile-safari-just-the-same-old-code/)).
-* leaveTransforms: (Boolean)
+
+### leaveTransforms: (Boolean)
 By default if the plugin is animating a left or a top property, the translate (2d or 3d depending on setting above) CSS3 transformation will be used. To preserve other layout dependencies, once the transition is complete, these transitions are removed and converted back to the real left and top values. Set this to true to skip this functionality.
-* avoidCSSTransitions: (Boolean)
+
+### avoidCSSTransitions: (Boolean)
 Set this to true to revert to native animate() method, avoiding the plugin entirely. The default for this setting is false, but can be overridden using $.toggleDisabledByDefault()
 
 
@@ -79,6 +82,10 @@ Since v0.77, the plugin will now automatically use 3D Translations where support
 
 Changelog
 -----------------
+
+1.0 (8/5/2103):
+
+* Fix avoidTransforms: true behaviour for directional transitions
 
 0.99 (5/12/2012):
 

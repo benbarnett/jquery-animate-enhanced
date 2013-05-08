@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v0.99
+jquery.animate-enhanced plugin v1.0
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	1.0 (8/5/2103):
+		- Fix avoidTransforms: true behaviour for directional transitions
+
 	0.99.1 (3/4/2013):
 		- Add Set or unset the 'disabled by default' value (PR #117)
 
@@ -368,12 +371,14 @@ Changelog:
 			offsetPosition = value,
 			isDirection = jQuery.inArray(property, directions) > -1;
 
+
 		if (isDirection) {
 			var meta = enhanceData.meta,
 				cleanPropertyValue = _cleanValue(e.css(property)) || 0,
 				stashedProperty = property + '_o';
 
 			offsetPosition = value - cleanPropertyValue;
+
 
 			meta[property] = offsetPosition;
 			meta[stashedProperty] = e.css(property) == 'auto' ? 0 + offsetPosition : cleanPropertyValue + offsetPosition || 0;
@@ -408,6 +413,7 @@ Changelog:
 	function _applyCSSWithPrefix(e, cssProperties, property, duration, easing, value, isTransform, isTranslatable, use3D) {
 		var saveOriginal = false,
 			transform = isTransform === true && isTranslatable === true;
+
 
 		cssProperties = cssProperties || {};
 		if (!cssProperties.original) {
@@ -617,7 +623,7 @@ Changelog:
 			},
 			bypassPlugin = (typeof prop['avoidCSSTransitions'] !== 'undefined') ? prop['avoidCSSTransitions'] : pluginDisabledDefault;
 
-		if (bypassPlugin === true || !cssTransitionsSupported || _isEmptyObject(prop) || _isBoxShortcut(prop) || optall.duration <= 0 || (jQuery.fn.animate.defaults.avoidTransforms === true && prop['avoidTransforms'] !== false)) {
+		if (bypassPlugin === true || !cssTransitionsSupported || _isEmptyObject(prop) || _isBoxShortcut(prop) || optall.duration <= 0) {
 			return originalAnimateMethod.apply(this, arguments);
 		}
 
@@ -699,13 +705,14 @@ Changelog:
 					var isDirection = jQuery.inArray(p, directions) > -1,
 						cleanVal = _interpretValue(self, prop[p], p, (isDirection && prop.avoidTransforms !== true));
 
-					if (prop.avoidTransforms !== true && _appropriateProperty(p, cleanVal, self)) {
+
+					if (/**prop.avoidTransforms !== true && **/_appropriateProperty(p, cleanVal, self)) {
 						_applyCSSTransition(
 							self,
 							p,
 							opt.duration,
 							cssEasing,
-							isDirection && prop.avoidTransforms === true ? cleanVal + valUnit : cleanVal,
+							cleanVal, //isDirection && prop.avoidTransforms === true ? cleanVal + valUnit : cleanVal,
 							isDirection && prop.avoidTransforms !== true,
 							isTranslatable,
 							prop.useTranslate3d === true);
@@ -720,6 +727,7 @@ Changelog:
 			self.unbind(transitionEndEvent);
 
 			var selfCSSData = self.data(DATA_KEY);
+
 
 			if (selfCSSData && !_isEmptyObject(selfCSSData) && !_isEmptyObject(selfCSSData.secondary)) {
 				callbackQueue++;
