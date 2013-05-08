@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v1.01
+jquery.animate-enhanced plugin v1.02
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	1.02 (8/5/2013):
+		- Fixing use3D default flags. It must explicitly be set to false to disable 3d now, the plugin by default will use it if available.
+
 	1.01 (8/5/2013):
 		- Adding appropriate display value for wider range of elements (issue #121 - thanks smacky)
 
@@ -350,7 +353,7 @@ Changelog:
 		@param {boolean} [use3D] Use translate3d if available?
 	*/
 	function _getTranslation(x, y, use3D) {
-		return ((use3D === true || (use3DByDefault === true && use3D !== false)) && has3D) ? 'translate3d(' + x + 'px, ' + y + 'px, 0)' : 'translate(' + x + 'px,' + y + 'px)';
+		return ((use3D === true || ((use3DByDefault === true && use3D !== false)) && has3D)) ? 'translate3d(' + x + 'px, ' + y + 'px, 0)' : 'translate(' + x + 'px,' + y + 'px)';
 	}
 
 
@@ -743,7 +746,7 @@ Changelog:
 							cleanVal, //isDirection && prop.avoidTransforms === true ? cleanVal + valUnit : cleanVal,
 							isDirection && prop.avoidTransforms !== true,
 							isTranslatable,
-							prop.useTranslate3d === true);
+							prop.useTranslate3d);
 
 					}
 					else {

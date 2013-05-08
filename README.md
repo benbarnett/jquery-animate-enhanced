@@ -83,6 +83,10 @@ Since v0.77, the plugin will now automatically use 3D Translations where support
 Changelog
 -----------------
 
+1.02 (8/5/2013):
+
+* Fixing use3D default flags. It must explicitly be set to false to disable 3d now, the plugin by default will use it if available. (issue #110)
+
 1.01 (8/5/2013):
 
 * Adding appropriate display value for wider range of elements (issue #121 - thanks smacky)
