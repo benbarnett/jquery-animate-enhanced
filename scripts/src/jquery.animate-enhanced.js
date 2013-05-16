@@ -641,14 +641,13 @@ Changelog:
 		prop = prop || {};
 		var isTranslatable = !(typeof prop['bottom'] !== 'undefined' || typeof prop['right'] !== 'undefined'),
 			optall = jQuery.speed(speed, easing, callback),
-			elements = this,
 			callbackQueue = 0,
 			propertyCallback = function() {
 				callbackQueue--;
 				if (callbackQueue === 0) {
 					// we're done, trigger the user callback
 					if (typeof optall.complete === 'function') {
-						optall.complete.apply(elements, arguments);
+						optall.complete.apply(this, arguments);
 					}
 				}
 			},
