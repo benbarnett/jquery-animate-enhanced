@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v1.02
+jquery.animate-enhanced plugin v1.03
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	1.03 (19/7/2013):
+		- Merge PR #129 (Use originalAnimateMethod if a step callback function is provided.) /thx @lehni
+
 	1.02 (8/5/2013):
 		- Fixing use3D default flags. It must explicitly be set to false to disable 3d now, the plugin by default will use it if available.
 
