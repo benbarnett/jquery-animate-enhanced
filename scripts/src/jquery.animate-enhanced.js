@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v1.03
+jquery.animate-enhanced plugin v1.04
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	1.04 (14/08/2013):
+		- Using fix from issue #69 by @rickyk586 to support percentages
+
 	1.03 (19/7/2013):
 		- Merge PR #129 (Use originalAnimateMethod if a step callback function is provided.) /thx @lehni
 
@@ -340,6 +343,10 @@ Changelog:
 
 			// If a +=/-= token was provided, we're doing a relative animation
 			if (parts[1]) end = ((parts[1] === '-=' ? -1 : 1) * end) + parseInt(cleanStart, 10);
+
+			// check for unit  as per issue #69
+			if (parts[3] == '%') end = end + '%';
+
 			return end;
 		} else {
 			return cleanStart;

@@ -83,6 +83,10 @@ Since v0.77, the plugin will now automatically use 3D Translations where support
 Changelog
 -----------------
 
+1.04 (14/08/2013):
+
+* Using fix from issue #69 by @rickyk586 to support percentages
+
 1.03 (19/7/2013):
 
 * Merge PR #129 (Use originalAnimateMethod if a step callback function is provided.) /thx @lehni
