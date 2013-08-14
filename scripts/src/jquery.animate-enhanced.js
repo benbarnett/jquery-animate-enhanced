@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v1.04
+jquery.animate-enhanced plugin v1.05
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	1.05 (14/08/2013):
+		- Merging PR #124 fix for highcharts clash. Thanks @bensonc!
+
 	1.04 (14/08/2013):
 		- Using fix from issue #69 by @rickyk586 to support percentages
 
