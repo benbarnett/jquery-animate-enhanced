@@ -335,7 +335,8 @@ Changelog:
 
 		// deal with shortcuts
 		if (!parts && val == 'show') {
-			cleanStart = 1;
+			var defaultOpacity = e.css('opacity');
+			cleanStart = typeof defaultOpacity === 'undefined' || parseFloat(defaultOpacity) === 0 ? 1 : defaultOpacity;
 			if (hidden) e.css({'display': _domElementVisibleDisplayValue(e.context.tagName), 'opacity': 0});
 		} else if (!parts && val == "hide") {
 			cleanStart = 0;
