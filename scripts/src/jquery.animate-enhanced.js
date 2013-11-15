@@ -335,7 +335,8 @@ Changelog:
 
 		// deal with shortcuts
 		if (!parts && val == 'show') {
-			cleanStart = 1;
+			var defaultOpacity = e.css('opacity');
+			cleanStart = typeof defaultOpacity === 'undefined' || parseFloat(defaultOpacity) === 0 ? 1 : defaultOpacity;
 			if (hidden) e.css({'display': _domElementVisibleDisplayValue(e.context.tagName), 'opacity': 0});
 		} else if (!parts && val == "hide") {
 			cleanStart = 0;
@@ -673,6 +674,7 @@ Changelog:
 		return this[ optall.queue === true ? 'queue' : 'each' ](function() {
 			var self = jQuery(this),
 				opt = jQuery.extend({}, optall),
+				defEasing = jQuery.easing.def,
 				cssCallback = function(e) {
 					var selfCSSData = self.data(DATA_KEY) || { original: {} },
 						restore = {};
@@ -740,7 +742,7 @@ Changelog:
 					easeInOutBack:  CUBIC_BEZIER_OPEN + '0.680, -0.550, 0.265, 1.550' + CUBIC_BEZIER_CLOSE
 				},
 				domProperties = {},
-				cssEasing = easings[opt.easing || 'swing'] ? easings[opt.easing || 'swing'] : opt.easing || 'swing';
+				cssEasing = easings[opt.easing || defEasing] ? easings[opt.easing || defEasing] : opt.easing || defEasing;
 
 			// seperate out the properties for the relevant animation functions
 			for (var p in prop) {
@@ -795,7 +797,7 @@ Changelog:
 				callbackQueue++;
 				originalAnimateMethod.apply(self, [domProperties, {
 					duration: opt.duration,
-					easing: jQuery.easing[opt.easing] ? opt.easing : (jQuery.easing.swing ? 'swing' : 'linear'),
+					easing: jQuery.easing[opt.easing] ? opt.easing : defEasing,
 					complete: propertyCallback,
 					queue: opt.queue
 				}]);
