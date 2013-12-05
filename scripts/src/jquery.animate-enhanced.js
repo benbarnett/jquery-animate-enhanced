@@ -336,8 +336,31 @@ Changelog:
 		// deal with shortcuts
 		if (!parts && val == 'show') {
 			cleanStart = 1;
-			if (hidden) e.css({'display': _domElementVisibleDisplayValue(e.context.tagName), 'opacity': 0});
-		} else if (!parts && val == "hide") {
+			if (hidden) {
+				elem = e[0];
+				if (elem.style) {
+					display = elem.style.display;
+
+					// Reset the inline display of this element to learn if it is
+					// being hidden by cascaded rules or not
+					if (!jQuery._data(elem, 'olddisplay') && display === 'none') {
+						display = elem.style.display = '';
+					}
+
+					// Set elements which have been overridden with display: none
+					// in a stylesheet to whatever the default browser style is
+					// for such an element
+					if ( display === '' && jQuery.css(elem, 'display') === 'none' ) {
+						jQuery._data(elem, 'olddisplay', _domElementVisibleDisplayValue(elem.context.tagName));
+					}
+
+					if (display === '' || display === 'none') {
+						elem.style.display = jQuery._data(elem, 'olddisplay') || '';
+					}
+				}
+				e.css('opacity', 0);
+			}
+		} else if (!parts && val == 'hide') {
 			cleanStart = 0;
 		}
 
@@ -702,7 +725,17 @@ Changelog:
 
 					// if we used the fadeOut shortcut make sure elements are display:none
 					if (prop.opacity === 'hide') {
-						self.css({'display': 'none', 'opacity': ''});
+						elem = self[0];
+						if (elem.style) {
+							display = jQuery.css(elem, 'display');
+
+							if (display !== 'none' && !jQuery._data(elem, 'olddisplay')) {
+								jQuery._data(elem, 'olddisplay', display);
+							}
+							elem.style.display = 'none';
+						}
+
+						self.css('opacity', '');
 					}
 
 					// run the main callback function
