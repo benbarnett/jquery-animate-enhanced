@@ -374,7 +374,7 @@ Changelog:
 			if (parts[1]) end = ((parts[1] === '-=' ? -1 : 1) * end) + parseInt(cleanStart, 10);
 
 			// check for unit  as per issue #69
-			if (parts[3] == '%') end = end + '%';
+			if (parts[3] && parts[3] != 'px') end = end + parts[3];
 
 			return end;
 		} else {
