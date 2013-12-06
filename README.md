@@ -83,6 +83,10 @@ Since v0.77, the plugin will now automatically use 3D Translations where support
 Changelog
 -----------------
 
+1.07 (06/12/2013):
+
+* Other units, beside '%' should also be kept
+
 1.06 (06/12/2013):
 
 * Merging PR #140 Do not change a user defined display mode for elements, after show/hide

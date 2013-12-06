@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v1.06
+jquery.animate-enhanced plugin v1.07
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	1.07 (06/12/2013):
+		- Merging PR #139 Other units, beside '%' should also be kept
+
 	1.06 (06/12/2013):
 		- Merging PR #140 Do not change a user defined display mode for elements, after show/hide
 
