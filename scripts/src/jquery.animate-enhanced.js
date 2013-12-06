@@ -1,11 +1,11 @@
 /*
-jquery.animate-enhanced plugin v1.05
+jquery.animate-enhanced plugin v1.06
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
 @benpbarnett
 ---
-Copyright (c) 2012 Ben Barnett
+Copyright (c) 2013 Ben Barnett
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	1.06 (06/12/2013):
+		- Merging PR #140 Do not change a user defined display mode for elements, after show/hide
+
 	1.05 (14/08/2013):
 		- Merging PR #124 fix for highcharts clash. Thanks @bensonc!
 
