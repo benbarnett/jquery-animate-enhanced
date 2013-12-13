@@ -357,7 +357,7 @@ Changelog:
 					// in a stylesheet to whatever the default browser style is
 					// for such an element
 					if ( display === '' && jQuery.css(elem, 'display') === 'none' ) {
-						jQuery._data(elem, 'olddisplay', _domElementVisibleDisplayValue(elem.context.tagName));
+						jQuery._data(elem, 'olddisplay', _domElementVisibleDisplayValue(e.context.tagName));
 					}
 
 					if (display === '' || display === 'none') {
