@@ -25,6 +25,9 @@ Demo
 -----------------
 Simple animation demo and documentation found here: http://playground.benbarnett.net/jquery-animate-enhanced/
 
+[![Clone in Koding](http://learn.koding.com/btn/clone_d.png)][koding]
+[koding]: https://koding.com/Teamwork?import=https://github.com/benbarnett/jQuery-Animate-Enhanced/archive/master.zip&c=git3
+
 
 What it does
 -----------------
