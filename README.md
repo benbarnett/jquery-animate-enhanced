@@ -86,6 +86,10 @@ Since v0.77, the plugin will now automatically use 3D Translations where support
 Changelog
 -----------------
 
+1.08 (16/01/2014):
+
+* Merging PR #147 Access element tag name appropriately
+
 1.07 (06/12/2013):
 
 * Other units, beside '%' should also be kept

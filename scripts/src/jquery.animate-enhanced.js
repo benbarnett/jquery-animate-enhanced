@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v1.07
+jquery.animate-enhanced plugin v1.08
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	1.08 (16/01/2014):
+		- Merging PR #147 Access element tag name appropriately
+
 	1.07 (06/12/2013):
 		- Merging PR #139 Other units, beside '%' should also be kept
 
