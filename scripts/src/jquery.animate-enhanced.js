@@ -249,7 +249,22 @@ Changelog:
 		- Less need for leaveTransforms = true due to better position detections
 */
 
-(function(jQuery, originalAnimateMethod, originalStopMethod) {
+(function (window, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['jquery'], function(){
+            return factory.apply(window, arguments);
+        });
+    } else if (typeof module === 'object' && module.exports) {
+        // NodeJS.
+        module.exports = factory.call(window, require('jquery'));
+    } else {
+        // Browser globals
+        factory.call(window, window.jQuery);
+    }
+}(typeof global === 'object' ? global : this, function (jQuery) {
+    var originalAnimateMethod = jQuery.fn.animate,
+        originalStopMethod = jQuery.fn.stop;
 
 	// ----------
 	// Plugin variables
@@ -931,4 +946,4 @@ Changelog:
 
 		return this;
 	};
-})(jQuery, jQuery.fn.animate, jQuery.fn.stop);
+}));
