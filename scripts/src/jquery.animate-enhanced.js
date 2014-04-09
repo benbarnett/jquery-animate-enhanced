@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v1.09
+jquery.animate-enhanced plugin v1.10
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	1.10 (09/04/2014):
+		- Merging PR #153 Don't try to restore values which weren't saved
+
 	1.09 (09/04/2014):
 		- Merging PR #154 Added support of AMD and Node.js (via browserify) environments
 

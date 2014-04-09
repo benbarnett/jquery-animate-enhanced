@@ -86,6 +86,14 @@ Since v0.77, the plugin will now automatically use 3D Translations where support
 Changelog
 -----------------
 
+1.10 (09/04/2014):
+
+* Merging PR #153 Don't try to restore values which weren't saved
+
+1.09 (09/04/2014):
+
+* Merging PR #154 Added support of AMD and Node.js (via browserify) environments
+
 1.08 (16/01/2014):
 
 * Merging PR #147 Access element tag name appropriately
