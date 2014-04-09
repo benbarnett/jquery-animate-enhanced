@@ -1,5 +1,5 @@
 /*
-jquery.animate-enhanced plugin v1.08
+jquery.animate-enhanced plugin v1.09
 ---
 http://github.com/benbarnett/jQuery-Animate-Enhanced
 http://benbarnett.net
@@ -44,6 +44,9 @@ Usage (exactly the same as it would be normally):
 	});
 
 Changelog:
+	1.09 (09/04/2014):
+		- Merging PR #154 Added support of AMD and Node.js (via browserify) environments
+
 	1.08 (16/01/2014):
 		- Merging PR #147 Access element tag name appropriately
 
