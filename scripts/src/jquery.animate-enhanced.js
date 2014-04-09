@@ -79,7 +79,7 @@ Changelog:
 
 	0.99 (5/12/2012):
 		- PR #109 Added support for list-item nodes. FadeIn on tags was omitting the list-style support. (thx @SeanCannon)
-		
+
 	0.98 (12/11/2012):
 		- Merging pull request #106 thx @gboysko - checking for ownerDocument before using getComputedStyle
 
@@ -92,7 +92,7 @@ Changelog:
 	0.96 (20/08/2012):
 		- Fixes for context, all elements returned as context (issue #84)
 		- Reset position with leaveTransforms !== true fixes (issue #93)
-		
+
 
 	0.95 (20/08/2012):
 		- If target opacity == current opacity, pass back to jquery native to get callback firing (#94)
@@ -346,7 +346,7 @@ Changelog:
 		// this is a nasty fix, but we check for prop == 'd' to see if we're dealing with SVG, and abort
 		if (prop == "d") return;
 		if (!_isValidElement(e)) return;
-		
+
 		var parts = rfxnum.exec(val),
 			start = e.css(prop) === 'auto' ? 0 : e.css(prop),
 			cleanCSSStart = typeof start == 'string' ? _cleanValue(start) : start,
@@ -627,8 +627,8 @@ Changelog:
 		toggle3DByDefault: function() {
 			return use3DByDefault = !use3DByDefault;
 		},
-		
-		
+
+
 		/**
 			@public
 			@name toggleDisabledByDefault
@@ -737,8 +737,11 @@ Changelog:
 						}
 						if (isTranslatable && typeof selfCSSData.meta !== 'undefined') {
 							for (var j = 0, dir; (dir = directions[j]); ++j) {
-								restore[dir] = selfCSSData.meta[dir + '_o'] + valUnit;
-								jQuery(this).css(dir, restore[dir]);
+								var stashedProperty = selfCSSData.meta[dir + '_o'];
+								if (stashedProperty) {
+									restore[dir] = stashedProperty + valUnit;
+									jQuery(this).css(dir, restore[dir]);
+								}
 							}
 						}
 					}
