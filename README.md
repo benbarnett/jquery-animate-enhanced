@@ -86,6 +86,10 @@ Since v0.77, the plugin will now automatically use 3D Translations where support
 Changelog
 -----------------
 
+1.11 (08/07/2014):
+
+* Merging PR #157, fixes #156 for animating with 0
+
 1.10 (09/04/2014):
 
 * Merging PR #153 Don't try to restore values which weren't saved
@@ -262,7 +266,7 @@ Changelog
 0.64 (27/01/2011):
 
 * BUGFIX #13: .slideUp(), .slideToggle(), .slideDown() bugfixes in Webkit
-        
+
 0.63 (12/01/2011):
 
 * BUGFIX #11: callbacks not firing when new value == old value
@@ -299,7 +303,7 @@ Changelog
 
 * New $.translate() method to easily calculate current transformed translation
 * Repeater callback bug fix for leaveTransforms:true (was constantly appending properties)
-	
+
 0.52 (16/11/2010):
 
 * leaveTransforms: true bug fixes
