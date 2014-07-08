@@ -741,7 +741,7 @@ Changelog:
 						if (isTranslatable && typeof selfCSSData.meta !== 'undefined') {
 							for (var j = 0, dir; (dir = directions[j]); ++j) {
 								var stashedProperty = selfCSSData.meta[dir + '_o'];
-								if (stashedProperty) {
+								if (typeof stashedProperty !== 'undefined') {
 									restore[dir] = stashedProperty + valUnit;
 									jQuery(this).css(dir, restore[dir]);
 								}
