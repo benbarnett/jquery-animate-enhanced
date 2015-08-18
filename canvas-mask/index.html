@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	<title>Canvas Mask Demo</title>
+	<style>
+		html {
+			background-image: -webkit-gradient(
+			    linear,
+			    left bottom,
+			    left top,
+			    color-stop(0.13, rgb(119,84,184)),
+			    color-stop(0.54, rgb(32,50,122))
+			);
+			background-image: -moz-linear-gradient(
+			    center bottom,
+			    rgb(119,84,184) 13%,
+			    rgb(32,50,122) 54%
+			);
+			
+			
+			height:100%;
+			overflow:hidden;
+		}
+		body {
+			width:100%;
+			height:100%;
+		}
+		
+		canvas {
+
+			position:relative;
+			width:500px;
+			height:500px;
+			left:50%;
+			top:50%;
+			margin:-250px 0 0 -250px;
+			
+			-webkit-animation-name: rotate;
+			-webkit-transform:rotate(0deg);
+		}
+		
+		canvas.rotate {
+			-webkit-animation-duration: 5s;
+			-webkit-animation-iteration-count: infinite;
+			-webkit-animation-timing-function: linear;
+		}
+		
+		@-webkit-keyframes rotate {
+			from {
+				-webkit-transform: rotate(0deg);
+			}
+			to {
+				-webkit-transform: rotate(360deg);
+			}
+		}
+	</style>
+</head>
+
+<body>
+
+	<canvas id="master" width="500" height="500"></canvas>
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+	<script src="js/canvasMask.js"></script>
+	<script>
+		(function() {
+			var paths = [
+					{ src: "img/alpha.png", type: "alpha" }, 
+					{ src: "img/octagon.jpg", type: "base" }
+				],
+				images = {},
+				
+				outputCanvas = document.getElementById('master'),
+				output = outputCanvas.getContext && outputCanvas.getContext('2d'),
+
+				width = 500,
+				height = 500;
+			
+			
+			/**
+				Kick off.
+			*/	
+			loadImages(function() {
+				output.globalCompositeOperation = "lighter";
+				output.putImageData(
+					applyCanvasMask(images['base'], images['alpha'], width, height), 0, 0, 0, 0, width, height
+				);
+				outputCanvas.className = "rotate";
+				
+				$('body').css({'background-image': 'url(' + applyCanvasMask(images['base'], images['alpha'], width, height, true) + ')'});
+			});
+			
+			/**
+				@private
+				@name loadImages
+				@function
+				@description Preload images and fire single callback
+			*/
+			function loadImages(callback) {
+				i = paths.length;
+				while (i--) {
+					loadImage(paths[i], function(type) {
+						images[type] = this;
+						
+						c = 0;
+						for (o in images) c++;
+						c === paths.length && callback();
+					});
+				}
+			};
+			
+			
+			/**
+				@private
+				@name loadImage
+				@function
+				@description Preload (and compare) image
+			*/
+			function loadImage(obj, callback) {
+				var image = new Image();
+
+				// set onload actions
+				image.onload = function() {
+					typeof callback === 'function' && callback.call(this, obj.type);
+				};
+
+				// kick off image load
+				image.src = obj.src;
+
+				return this;
+			};
+		})();
+	</script>
+
+</body>
+</html>
