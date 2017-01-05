@@ -723,6 +723,12 @@ Changelog:
 			bypassPlugin = (typeof prop['avoidCSSTransitions'] !== 'undefined') ? prop['avoidCSSTransitions'] : pluginDisabledDefault;
 
 		if (bypassPlugin === true || !cssTransitionsSupported || _isEmptyObject(prop) || _isBoxShortcut(prop) || optall.duration <= 0 || optall.step) {
+			//fallback for special easing that use CUBIC_BEZIER.
+			if($.easing && !$.easing.hasOwnProperty(arguments[2])) {
+				if((arguments[2] !== 'linear' && arguments[2] !== 'swing') ){
+					arguments[2] = 'swing';
+				}
+			}
 			return originalAnimateMethod.apply(this, arguments);
 		}
 
