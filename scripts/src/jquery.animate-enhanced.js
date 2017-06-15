@@ -618,7 +618,7 @@ Changelog:
 		}
 
 		var is = jQuery.inArray(prop, cssTransitionProperties) > -1;
-		if ((prop == 'width' || prop == 'height' || prop == 'opacity') && (parseFloat(value) === parseFloat(element.css(prop)))) is = false;
+		if ((prop == 'width' || prop == 'height' || prop == 'opacity' || prop == 'left' || prop == 'top') && (parseFloat(value) === parseFloat(element.css(prop)))) is = false;
 		return is;
 	}
 
