@@ -725,6 +725,11 @@ Changelog:
 		if (bypassPlugin === true || !cssTransitionsSupported || _isEmptyObject(prop) || _isBoxShortcut(prop) || optall.duration <= 0 || optall.step) {
 			return originalAnimateMethod.apply(this, arguments);
 		}
+		
+		if(prop.opacity === 'hide' && jQuery(this).is(':hidden'))
+		{
+			return originalAnimateMethod.apply(this, arguments);
+		}
 
 		return this[ optall.queue === true ? 'queue' : 'each' ](function() {
 			var self = jQuery(this),
