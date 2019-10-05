@@ -358,4 +358,4 @@ Credits
 
 * Author: Ben Barnett - http://www.benbarnett.net - @benpbarnett
 * HeyDanno! for his tips on detecting CSS3 support (http://gist.github.com/435054)
-* Aza for his gist on CSS Animation wtih jQuery (http://gist.github.com/373874)
+* Aza for his gist on CSS Animation with jQuery (http://gist.github.com/373874)
